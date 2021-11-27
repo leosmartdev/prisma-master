@@ -1,0 +1,34 @@
+syntax="proto3";
+
+package prisma.tms.db;
+
+option go_package = "db";
+
+enum DatabaseEngine {
+    // The default state is "unknown", which will probably result in an error
+    Unknown  = 0;
+
+    // The RethinkDB driver
+    RethinkDB = 1;
+
+    // The MongoDB driver
+    MongoDB = 2;
+}
+
+message DBConnectionRequest {
+}
+
+message DBConnectionParams {
+    // Database engine type
+    DatabaseEngine engine = 1;
+
+    // Name of database (usually something like "trident"
+    string database = 2;
+
+    // Database connection strings (repeated for cluster settings)
+    repeated string addresses = 3;
+
+    // Authentication key (Rethink doesn't use user/pass. Add those fields in
+    // the future if other databases are used.)
+    string authkey = 4;
+}

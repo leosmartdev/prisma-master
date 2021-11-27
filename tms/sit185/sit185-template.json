@@ -1,0 +1,11 @@
+{
+	"msg_num": "2\\..+?MSG.*?NO.+?(?P<msg_num>\\d+).*",
+	"date": "3\\..+?DETECTED AT.+?(?P<date>.+UTC)",
+	"date_format": "%D %M %Y %H%MN %TZ",
+	"hex_id": "11\\..+?HEX.+ID\\s*(?P<hex_id>\\S*)\\s",
+	"doppler_a": "(?m)8\\.(?s).*DOPPLER\\s*A\\s*[-|–]\\s*(?P<doppler_a>NIL|UNKNOWN|(?P<doppler_a_lat_degree>\\d+).*?(?P<doppler_a_lat_min>\\d+\\.\\d+).*?(?P<doppler_a_lat_cardinal_point>[N|S]).*?(?P<doppler_a_lon_degree>\\d+).*?(?P<doppler_a_lon_min>\\d+\\.\\d+).*?(?P<doppler_a_lon_cardinal_point>[E|W]).*?(?P<doppler_a_prob>\\d+|$).*?).*9\\.",
+	"doppler_b": "(?m)8\\.(?s).*DOPPLER\\s*B\\s*[–|-]\\s*(?P<doppler_b>NIL|UNKNOWN|(?P<doppler_b_lat_degree>\\d+).*?(?P<doppler_b_lat_min>\\d+\\.\\d+).*?(?P<doppler_b_lat_cardinal_point>[N|S]).*?(?P<doppler_b_lon_degree>\\d+).*?(?P<doppler_b_lon_min>\\d+\\.\\d+).*?(?P<doppler_b_lon_cardinal_point>[E|W]).*?(?P<doppler_b_prob>\\d+|$).*?).*9\\.",
+	"encoded":	"8\\.(?s).*ENCODED\\s*?[-|–]\\s*(?P<encoded>NIL|UNKNOWN|(?P<encoded_lat_degree>.*?\\d+)(?P<encoded_lat_min>.*?\\d+\\.\\d+)(?P<encoded_lat_cardinal_point>.*?[N|S]).*?(?P<encoded_lon_degree>\\d+)(?P<encoded_lon_min>.*?\\d+\\.\\d+)(?P<encoded_lon_cardinal_point>.*?[E|W]).*?\n).*9\\.",
+	"confirmed": "8\\.(?s).*CONFIRMED\\s*?[–|-]\\s*(?P<confirmed>NIL|UNKNOWN|(?P<confirmed_lat_degree>.*?\\d+)(?P<confirmed_lat_min>.*?\\d+\\.\\d+)(?P<confirmed_lat_cardinal_point>.*?[N|S])(?P<confirmed_lon_degree>.*?\\d+)(?P<confirmed_lon_min>.*?\\d+\\.\\d+)(?P<confirmed_lon_cardinal_point>.*?[E|W]).*?\n).*9\\.",
+	"doa": 	"8\\.(?s).*DOA\\s*[–|-]\\s*(?P<doa>((?P<doa_lat_degree>.*?\\d+)(?P<doa_lat_min>.*?\\d+\\.\\d+)(?P<doa_lat_cardinal_point>.*?[N|S])(?P<doa_lon_degree>.*?\\d+)(?P<doa_lon_min>.*?\\d+\\.\\d+)(?P<doa_lon_cardinal_point>.*?[E|W]))(.*?ALTITUDE\\s*(?P<doa_elevation>.*?\\d+)|)).*9\\."
+}

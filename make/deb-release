@@ -1,0 +1,66 @@
+#!/bin/bash
+
+set -e
+
+. /etc/lsb-release
+
+BASEDIR=$(dirname "$0")/..
+BUILD=$BASEDIR/build/deb
+TAG_VERSION=$(git tag --points-at HEAD | tr -d v)
+FILE_VERSION=$(cat $BASEDIR/VERSION.txt)
+VERSION=$([[ ! -z "$TAG_VERSION" ]] && echo $TAG_VERSION || echo $FILE_VERSION)
+DEBIAN_REVISION=${DEBIAN_REVISION:-0}
+
+rm -rf $BUILD
+mkdir -p $BUILD
+cp -r $BASEDIR/make/packages/* $BUILD
+
+COMMIT=$(git rev-parse --short HEAD)
+TIMESTAMP=$(date +%y%m%d.%H%M%S)
+
+BRANCH=$CI_BUILD_REF_NAME
+[ "$BRANCH" ] || BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Underscores not allowed in debian package names
+BRANCH=$(echo $BRANCH | sed s/_/-/g)
+
+case $BRANCH in
+    master|stable|release)
+    	LABEL=
+    	;;
+    *)
+    	LABEL="-$BRANCH"
+        ;;
+esac
+
+sed -i s/@VERSION@/$VERSION/g      $BUILD/*/DEBIAN/control
+sed -i s/@COMMIT@/$COMMIT/g        $BUILD/*/DEBIAN/control
+sed -i s/@TIMESTAMP@/$TIMESTAMP/g  $BUILD/*/DEBIAN/control
+sed -i s?@BRANCH@?$LABEL?g         $BUILD/*/DEBIAN/control
+sed -i s/@DEBIAN_REVISION@/$DEBIAN_REVISION/g    $BUILD/*/DEBIAN/control
+
+PACKAGE=$(grep -e 'Package: '   $BUILD/tms/DEBIAN/control | cut -f2 -d" ")
+VERSION=$(grep -e 'Version: '   $BUILD/tms/DEBIAN/control | cut -f2 -d" ")
+ARCH=$(grep -e 'Architecture: ' $BUILD/tms/DEBIAN/control | cut -f2 -d" ")
+
+$BASEDIR/make/install-tms $BUILD/tms
+$BASEDIR/make/install-tms-db $BUILD/tms-db
+$BASEDIR/make/install-tms-dev $BUILD/tms-dev
+$BASEDIR/make/install-tms-mcc $BUILD/tms-mcc
+
+cp $BASEDIR/make/copyright $BASEDIR/make/packages/tms/DEBIAN/copyright
+cp $BASEDIR/make/copyright $BASEDIR/make/packages/tms-db/DEBIAN/copyright
+cp $BASEDIR/make/copyright $BASEDIR/make/packages/tms-dev/DEBIAN/copyright
+cp $BASEDIR/make/copyright $BASEDIR/make/packages/tms-mcc/DEBIAN/copyright
+
+rm -rf $BASEDIR/dist
+mkdir $BASEDIR/dist
+
+fakeroot dpkg-deb --build $BUILD/tms \
+    $BASEDIR/dist/${PACKAGE}_${VERSION}_${DISTRIB_CODENAME}_${ARCH}.deb
+fakeroot dpkg-deb --build $BUILD/tms-db \
+    $BASEDIR/dist/${PACKAGE}-db_${VERSION}_${DISTRIB_CODENAME}_${ARCH}.deb
+fakeroot dpkg-deb --build $BUILD/tms-mcc \
+    $BASEDIR/dist/${PACKAGE}-mcc_${VERSION}_${DISTRIB_CODENAME}_${ARCH}.deb
+fakeroot dpkg-deb --build $BUILD/tms-dev \
+    $BASEDIR/dist/${PACKAGE}-dev_${VERSION}_${DISTRIB_CODENAME}_${ARCH}.deb

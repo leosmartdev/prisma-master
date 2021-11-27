@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname "$0")/..
+[ $GOBIN ] || GOBIN=$GOPATH/bin
+DST=$1
+
+mkdir -p $DST/usr/bin
+mkdir -p $DST/usr/sbin
+
+cp $GOBIN/tmccd         $DST/usr/sbin/tmccd

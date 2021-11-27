@@ -1,0 +1,10 @@
+#!/bin/bash
+
+MONGO_URL=$1
+shift
+
+USER_ARGS="$@"
+SSL_ARGS="--ssl --sslPEMKeyFile /etc/trident/mongo.pem  --sslCAFile /etc/trident/mongoCA.crt"
+AUTHENTICATION_ARGS="--authenticationDatabase \$external --authenticationMechanism MONGODB-X509"
+
+mongo ${MONGO_URL} ${SSL_ARGS} ${AUTHENTICATION_ARGS} ${USER_ARGS}

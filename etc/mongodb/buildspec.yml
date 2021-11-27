@@ -1,0 +1,11 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - env
+
+artifacts:
+  files:
+    - mongodb/**/*.js
+  base-directory: src/prisma/etc

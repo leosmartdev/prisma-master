@@ -1,0 +1,7 @@
+syntax="proto3";
+
+package prisma.tms.rest;
+
+message RuleMetadata {
+    repeated string operandType = 1;
+}

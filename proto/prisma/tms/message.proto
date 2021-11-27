@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+import "prisma/tms/common.proto";
+
+package prisma.tms;
+option java_package="com.technosci.tms.message";
+
+//
+// TsiMessages carry other messages through the Trident communication
+// infrastructure. This type should contain only information relevant to
+// message routing and delivery -- nothing application specific.
+//
+message TsiMessage {
+
+    // ******************
+    // Message header information
+    enum Status {
+        UNKNOWN = 0;
+        REQUEST = 1; // An RPC processing request (command)
+        IN_PROGRESS = 2; // Sent by receiver of request when it must send
+                         // out an intermediate request to complete the
+                         // receiver's request
+        REPLY = 3; // The (non-error) response to the request
+        BROADCAST = 4; // A non-requested informative message
+        ERROR = 5; // An error occurred while while processing request
+        ACK = 6; // Acknowledge that a message was recieved
+        KEEPALIVE = 7; // Dummy message used to keep connection alive. Drop it
+    }
+
+    google.protobuf.Timestamp write_time = 1;       // time of message creation
+    google.protobuf.Timestamp send_time = 2;        // time of message send by tgwad
+    EndPoint source = 3;       // who originally sent message
+    repeated EndPoint destination = 4;  // who should receive message
+
+    //
+    // RPC command features
+    //
+    Status status = 5; // See Status
+    google.protobuf.Timestamp request_time = 6; // time the initial request was sent
+    google.protobuf.UInt32Value command_sequence = 7; // A monotonically increasing id
+                                     // for referencing the command
+                                     // sent between parties
+
+    bool real_time = 11;
+        // This message is to be delivered immediately. Don't queue it. If it
+        // cannot be delivered immediately, fail the delivery.
+
+    int32 notify_sent = 8;
+         // notify_sent: If non-zero, the local router should notify the
+         // source endpoint that the message has been sent by sending
+         // a message with the prisma.tms.routing.Delivery extension's msg_id
+         // set to this value
+
+    Error error = 9;
+    // End of header 
+    // **********************
+
+    // **********************
+    //  BODY -- Message can be anything
+    google.protobuf.Any body = 10;
+    // *********************
+}
+
+// EndPoint describes a particular TsiClient -- a daemon connected to TMS
+message EndPoint {
+    // Since proto3 doesn't have has_* methods, when these guys equal 0, it
+    // means no info.
+    uint32 site = 1;  // app host address
+    uint32 aid = 2;   // app id
+    uint32 eid = 3;   // app entry id (from tmsd)
+    uint32 pid = 4;   // app process id
+}

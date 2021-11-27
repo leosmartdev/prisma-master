@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package prisma.tms.public;
+
+import "prisma/tms/auth/user.proto";
+import "prisma/tms/client_api/common.proto";
+
+message Users {
+    // Array of Users
+    repeated prisma.tms.auth.User users = 1; 
+}
+
+message LoginRequest {
+    string userName = 1;
+    string token = 2;
+}
+
+message AuthRequest {
+    LoginRequest loginInfo = 1;
+
+    string id = 3;
+    prisma.tms.auth.User user_object = 4;
+}
+
+message AuthResponse {
+    // Was the object added new or updated?
+    prisma.tms.client_api.Status status = 1;
+
+    // The database ID of the object which was upserted
+    string id = 2;
+
+    prisma.tms.auth.User user_object = 3;
+}
+
+message AuthResponses {
+    repeated AuthResponse responses = 1;
+}

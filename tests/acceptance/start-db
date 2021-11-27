@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mongod \
+    --syslog \
+    --syslogFacility local0 \
+    --dbpath /var/trident/db-it \
+    --replSet replocal \
+    --port 27017 &

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+import "prisma/tms/target_track.proto";
+
+message TrackReport {
+    repeated Track tracks = 10;
+};

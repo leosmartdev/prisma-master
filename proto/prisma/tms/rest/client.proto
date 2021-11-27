@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package prisma.tms.rest;
+
+message Client {
+    string locale = 1;
+    string distance = 2;
+    string shortDistance = 3;
+    string speed = 4;
+    string coordinateFormat = 5;
+    string timeZone = 6;
+}

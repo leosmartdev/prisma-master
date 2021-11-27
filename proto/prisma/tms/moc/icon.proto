@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "prisma/tms/moc/file.proto";
+import "google/protobuf/timestamp.proto";
+
+message Icon {
+  string id = 1;
+  string track_type = 2;
+  string track_sub_type = 3;
+  string mac_address = 4;
+  FileMetadata metadata = 5;
+  google.protobuf.Timestamp timestamp = 6;
+  bool deleted = 7;
+
+  enum Action {
+    CREATE = 0;
+    READ = 1;
+    UPDATE = 2;
+    DELETE = 3;
+  }
+}
+
+message IconImage {
+  string id = 1;
+  string mac_address = 2;
+  FileMetadata metadata = 3;
+  google.protobuf.Timestamp timestamp = 4;
+
+  enum Action {
+    CREATE = 0;
+    READ = 1;
+  }
+}

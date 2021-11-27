@@ -1,0 +1,112 @@
+site_name: PRISMA C2
+repo_name: 'orolia/prisma'
+repo_url: 'https://github.com/orolia/prisma'
+edit_uri: blob/develop/doc/
+docs_dir: doc
+site_dir: build/documentation_site/
+dev_addr: '0.0.0.0:8000'
+copyright: 2019 Orolia
+extra:
+  search:
+    language: 'en'
+extra_css:
+  - 'stylesheets/extra.css'
+theme:
+  name: 'material'
+  logo: 'images/prisma-logo.svg'
+  feature:
+    tabs: true
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+nav:
+  - Home: index.md
+  - CHANGELOG: linked-documents/CHANGELOG.md
+  - Releases:
+    - Releases: https://documentation.mcmurdo.io/releases/stable/
+  - PRISMA UI Documentation:
+    - Home: https://documentation.mcmurdo.io/prisma-ui/latest
+  - Install:
+    - Quickstart: installation/quickstart.md
+    - Server Installation Guide: installation/installation.md
+    - Client Installation Guide: installation/client-installation.md
+    - Upgrade: installation/upgrade.md
+    - SSL Keys: installation/ssl.md
+  - Configuration:
+    - Server Configuration: configuration/server.md
+    - Incident Forwarding: developer/incident/forwarding.md
+    - MCC FTP: developer/mcc/MCC-Integration.md
+    - SARMAP integration: configuration/sarmap-c2.md
+    - Mongo DB Configuration: configuration/mongodb-conf.md
+    - Iptables Ubuntu Configuration: configuration/iptables-c2.md
+  - Developers:
+    - Home: developer/index.md
+    - PRISMA UI: https://documentation.mcmurdo.io/prisma-ui/latest/
+    - README: linked-documents/PRISMA_README.md
+    - Style Guide:
+      - Pull Requests & Code Review: developer/pull-request.md
+    - Create a PRISMA C2 Release: developer/release-process.md
+    - Update Version Numbers: developer/update-version-numbers.md
+    - Docker: developer/aws/code-build.md
+    - Installer: linked-documents/installer.md
+    - Replication/Failover: developer/replication.md
+    - APIs:
+      - REST API: https://orolia-prisma-c2.postman.co/collections/352230-e1e86aaf-b2c3-4e3b-b718-a74f4b7a0281?workspace=44d15d8d-0a82-4c95-8e74-d196d18dd868
+      - Go EJDB: linked-documents/tms/goejdb/README.md
+      - OmniCom Library: linked-documents/tms/cmd/tools/omnicom-lib-gen/README.md
+      - NMEA Library: linked-documents/tms/nmea/README.md
+      - NAF library:  linked-documents/tms/libnaf/README.md
+    - TMS Daemons & Scripts:
+      - Daemons:
+        - tanalyzed: linked-documents/tms/cmd/daemons/tanalyzed/README.md
+        - tauthd: linked-documents/tms/cmd/daemons/tauthd/README.md
+        - tdatabased: linked-documents/tms/cmd/daemons/tdatabased/README.md
+        - tfleetd: linked-documents/tms/cmd/daemons/tfleetd/README.md
+        - tgwad: linked-documents/tms/cmd/daemons/tgwad/README.md
+        - tmccd: linked-documents/tms/cmd/daemons/tmccd/README.md
+        - tmsd: linked-documents/tms/cmd/daemons/tmsd/README.md
+        - tnafexportd: linked-documents/tms/cmd/daemons/tnafexportd/README.md
+        - tnoid: linked-documents/tms/cmd/daemons/tnoid/README.md
+        - torbcommd: linked-documents/tms/cmd/daemons/torbcommd/README.md
+        - treportd: linked-documents/tms/cmd/daemons/treportd/README.md
+        - tselfsign: linked-documents/tms/cmd/daemons/tselfsign/README.md
+        - tspiderd: linked-documents/tms/cmd/daemons/tspiderd/README.md
+        - twebd: linked-documents/tms/cmd/daemons/twebd/README.md
+        - twebd public: linked-documents/tms/cmd/daemons/twebd/public/README.md
+      - Tools & Scripts:
+        - datagramdownlinkrequest: linked-documents/tms/cmd/tools/datagramdownlinkrequest/README.md
+        - nmea-lib-gen: linked-documents/tms/cmd/tools/nmea-lib-gen/README.md
+        - omnicom-iridium: linked-documents/tms/cmd/tools/omnicom-iridium/README.md
+        - rsm: linked-documents/tms/cmd/tools/rsm/README.md
+        - sarsat-start: linked-documents/tms/cmd/tools/sarsat-start/README.md
+        - tdemo: linked-documents/tms/cmd/tools/tdemo/README.md
+        - tloggernmea: linked-documents/tms/cmd/tools/tloggernmea/README.md
+        - tmccrd: linked-documents/tms/cmd/tools/tmccrd/README.md
+        - tmongo: linked-documents/tms/cmd/tools/tmongo/README.md
+        - tmongo-cli: linked-documents/tms/cmd/tools/tmongo-cli/README.md
+        - tping: linked-documents/tms/cmd/tools/tping/README.md
+        - tportald: linked-documents/tms/cmd/tools/tportald/README.md
+        - tsimulator: linked-documents/tms/cmd/tools/tsimulator/README.md
+        - twatch: linked-documents/tms/cmd/tools/twatch/README.md
+        - tcleaner_mongo: linked-documents/tms/cmd/tools/tcleaner_mongo/README.md
+        - generator: linked-documents/tms/cmd/tools/generator/README.md
+        - tms-recycle: linked-documents/tms/cmd/tools/tms-recycle/README.md
+        - tstart-tnoids: linked-documents/tms/cmd/tools/tstarter-tnoids/README.md
+    - AWS:
+      - AWS: developer/aws/index.md
+      - CloudWatch: developer/aws/cloud-watch.md
+      - CodeBuild: developer/aws/code-build.md
+      - Route 53: developer/aws/route-53.md
+      - Static Sites: developer/aws/static-sites.md
+      - CodePipeline: developer/aws/code-pipelines.md
+    - Documentation Site: developer/mkdocs.md
+  - Deployments:
+    - Deployments: deployments/index.md
+    - Chile: deployments/chile.md

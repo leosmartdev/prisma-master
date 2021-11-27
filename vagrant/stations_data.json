@@ -1,0 +1,23 @@
+[
+  {
+    "device": "ais",
+    "latitude": 1,
+    "longitude": 1,
+    "radius": 100,
+    "addr": ":9011"
+  },
+  {
+    "device": "radar",
+    "latitude": 1,
+    "longitude": 1,
+    "radius": 100,
+    "addr": ":9012"
+  },
+  {
+    "device": "ais",
+    "latitude": 1.187700,
+    "longitude": 104.02186,
+    "radius": 100,
+    "addr": ":9001"
+  }
+]

@@ -1,0 +1,151 @@
+{
+  "id": "5b1e630ad6800558a1becdfd",
+  "brand": {
+   "name": "PRISMA"
+  },
+  "meta": {
+   "device": {
+    "actions": {
+     "CREATE": 0,
+     "DELETE": 3,
+     "READ": 1,
+     "UPDATE": 2
+    },
+    "network": {
+     "type": [
+      "iridium"
+     ]
+    },
+    "type": [
+     "phone",
+     "email",
+     "ais",
+     "omnicom-vms",
+     "omnicom-solar",
+     "epirb",
+     "sart-radar",
+     "sart-ais",
+     "elt",
+     "plb",
+     "mob-ais"
+    ]
+   },
+   "fleet": {
+    "actions": {
+     "ADD_VESSEL": 4,
+     "CREATE": 0,
+     "DELETE": 3,
+     "READ": 1,
+     "REMOVE_VESSEL": 5,
+     "UPDATE": 2
+    }
+   },
+   "vessel": {
+    "actions": {
+     "ADD_DEVICE": 4,
+     "CREATE": 0,
+     "DELETE": 3,
+     "READ": 1,
+     "REMOVE_DEVICE": 5,
+     "UPDATE": 2
+    },
+    "type": [
+     "ship-fishing",
+     "ship-passenger",
+     "ship-cargo",
+     "ship-tanker",
+     "ship-pleasure",
+     "ship-supply",
+     "ship-utility",
+     "ship-research",
+     "ship-military"
+    ]
+   }
+  },
+  "site": {
+   "siteId": 1,
+   "type": "RCC",
+   "name": "Site Name",
+   "description": "Site description",
+   "address": "123",
+   "country": "US",
+   "capability": {
+    "inputIncident": true,
+    "outputIncident": true
+   }
+  },
+  "service": {
+   "ws": {
+    "map": "wss://localhost:8080/ws/v2/view/stream",
+    "tms": "wss://localhost:8080/ws/v2/"
+   },
+   "tms": {
+    "base": "https://localhost:8080/api/v2",
+    "device": "https://localhost:8080/api/v2/device",
+    "fleet": "https://localhost:8080/api/v2/fleet",
+    "track": "https://localhost:8080/api/v2/track",
+    "incident": "https://localhost:8080/api/v2/incident",
+    "communication": "https://localhost:8080/api/v2/communication",
+    "notification": "https://localhost:8080/api/v2/notification",
+    "vessel": "https://localhost:8080/api/v2/vessel",
+    "registry": "https://localhost:8080/api/v2/registry",
+    "rule": "https://localhost:8080/api/v2/rule",
+    "map": "https://localhost:8080/api/v2/view",
+    "zone": "https://localhost:8080/api/v2/zone",
+    "file": "https://localhost:8080/api/v2/file",
+    "pagination": "https://localhost:8080",
+    "swagger": "https://localhost:8080/api/v2/apidocs.json",
+    "activity": "http://localhost:7077/activity",
+    "request": "http://localhost:7077/request"
+   },
+   "aaa": {
+    "base": "https://localhost:8181/api/v2",
+    "session": "https://localhost:8181/api/v2/auth/session",
+    "user": "https://localhost:8181/api/v2/auth/user",
+    "role": "https://localhost:8181/api/v2/auth/role",
+    "policy": "https://localhost:8181/api/v2/auth/policy",
+    "profile": "https://localhost:8181/api/v2/auth/profile",
+    "audit": "https://localhost:8181/api/v2/auth/audit",
+    "pagination": "https://localhost:8181",
+    "swagger": "https://localhost:8181/api/v2/auth/apidocs.json"
+   },
+   "sim": {
+    "alert": "http://localhost:8089/v1/alert",
+    "target": "http://localhost:8089/v1/target",
+    "route": "http://localhost:8089/v1/route"
+   }
+  },
+  "client": {
+   "locale": "en-US",
+   "distance": "nauticalMiles",
+   "shortDistance": "meters",
+   "speed": "knots",
+   "coordinateFormat": "degreesMinutes",
+   "timeZone": "UTC",
+   "zoom": 10
+  },
+  "policy": {
+   "description": "Montes morbi quam ut lobortis rutrum curae porttitor nascetur mus cubilia vestibulum in semper nulla id sed ornare adipiscing eu nec etiam facilisis auctor nullam.",
+   "password": {
+    "lengthMinimum": "2",
+    "lengthMaximum": "128",
+    "pattern": "[a-zA-Z0-9_@.]",
+    "reuseMaximum": "3",
+    "durationMaximum": "2161h",
+    "durationMaximumConsequence": "RestrictedUser",
+    "authenticateFailedCountMaximum": "5",
+    "authenticateFailedMaximumConsequence": "LOCK"
+   },
+   "session": {
+    "single": "false",
+    "durationIdle": "20m",
+    "idleConsequence": "Administrator,UserManager",
+    "durationRenewal": "30m",
+    "durationMaximum": "16h"
+   },
+   "user": {
+    "inactiveDurationConsequenceLock": "2161h",
+    "inactiveDurationConsequenceDeactivate": "4320h"
+   }
+  }
+ }

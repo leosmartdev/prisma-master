@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname "$0")/..
+DST=$1
+
+mkdir -p $DST/usr/bin
+mkdir -p $DST/usr/share/tms-db/mongo/schema
+mkdir -p $DST/usr/share/tms-db/mongo/loaders
+mkdir -p $DST/etc/trident/db/
+
+cp -r $BASEDIR/etc/mongodb/*.js                     $DST/etc/trident/db/
+cp -r $BASEDIR/etc/mongodb/schema/*.js              $DST/usr/share/tms-db/mongo/schema/
+cp -r $BASEDIR/etc/mongodb/loaders/*.js             $DST/usr/share/tms-db/mongo/loaders/
+cp $BASEDIR/tms/cmd/tools/tmongo-cli/tmongo-cli     $DST/usr/bin/tmongo-cli

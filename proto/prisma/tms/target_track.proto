@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+option java_package = "mcm.proto";
+option java_outer_classname = "TargetTrack";
+
+import "prisma/tms/common.proto";
+import "prisma/tms/devices/devices.proto";
+import "prisma/tms/nmea/nmea.proto";
+import "prisma/tms/tv32/tv32.proto";
+import "prisma/tms/omnicom/Omnicom.proto";
+import "prisma/tms/sar/sarsatmessage.proto";
+import "prisma/tms/devices/manual.proto";
+import "prisma/tms/adsb/adsb.proto";
+import "prisma/tms/vtsx/vtsx.proto";
+import "prisma/tms/marker/marker.proto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+message SensorID {
+    uint32 site = 1;
+    uint32 eid = 2;
+}
+
+message TimeSerialNumber {
+    // We can generate unique IDs by using time (in seconds) and a
+    // sub-second counter. Using this strategy, the counter does not have
+    // to be persistent and can simply be stored in memory of the daemon
+    // producing serial numbers.
+    int64 seconds = 1;
+    int32 counter = 2;
+};
+
+// A target identifier
+message TargetID {
+    SensorID producer = 1;
+
+    oneof serialNumber {
+        // Generic serial number type
+        TimeSerialNumber timeSerial = 10;
+
+        // Sensor-specific fields:
+        //   Unlikely that sensors will provide IDs for each data item, so I
+        //   don't expect any sensor specific fields here.
+    };
+}
+
+message FusionInfo {
+    repeated string sources = 1;
+    double distance = 2;
+}
+
+// Dynamic information about vessels. New target each time information is
+// received (e.g. new target for each AIS position message.)
+message Target {
+    //IDs
+    TargetID id = 1;
+    prisma.tms.devices.DeviceType type = 3;
+
+    // Time at which this target data was sensed. (Best-guess time when
+    // multiple sources, e.g. ingest time vs. TV32 time)
+    google.protobuf.Timestamp time = 4;
+    // The time at which the data ingest daemon saw this data
+    google.protobuf.Timestamp ingest_time = 5;
+
+    //TODO: in the future the front end code has to be refactored to check for nil value in the wrappers
+    //instead of relying on validity check fields which should be deleted.
+    Point position = 10;
+    google.protobuf.DoubleValue course = 11;             // degrees
+    google.protobuf.DoubleValue heading = 12;            // degrees
+    google.protobuf.DoubleValue speed = 13;              // knots
+    google.protobuf.DoubleValue rate_of_turn = 14;       // degrees/minute
+
+
+
+    //These fields are omnicom specific to be able to handle SPR and HPR reporting period if part of SPR and HPR omnicom reports
+    //No validity check required talk to El mehdi Rahoui.
+    uint32 report_period = 20;
+    // Volatage input comes with HPR and is part of omnicom VMS
+    double voltage_input = 21;
+    // Geofence status and id alert are part of HPR
+    uint32 geofence_status = 22;
+    uint32 geofence_id = 23;
+    // Message id is an omnicom id for messsages that were requested.
+    uint32 message_id = 24;
+
+    //multi points for sarsat alerts
+    repeated Point positions = 30;
+    bool repeat = 31;
+
+    // Base timeouts on this time, normally the same as the time value
+    // but latest update on a track extension
+    google.protobuf.Timestamp update_time = 32;
+
+    prisma.tms.nmea.Nmea nmea = 100;
+    prisma.tms.tv32.TV32Data tv32 = 101;
+    FusionInfo fusion = 103;
+    string activity_id = 104;
+    prisma.tms.omnicom.Omni omnicom = 105;
+    // sarsat proto structure
+    prisma.tms.sar.SarsatMessage sarmsg = 106;
+    string mmsi = 107;
+    google.protobuf.StringValue  imei = 108;
+    google.protobuf.StringValue  nodeid = 109;
+    prisma.tms.devices.ManualDevice manual = 110;
+    prisma.tms.adsb.Adsb adsb = 112;
+    prisma.tms.vtsx.VTSRadar vtsRadar = 113;
+    prisma.tms.marker.Marker marker = 114;
+}
+
+// Static information
+//
+// Note: Only add to this message if the following is true:
+//
+// - The message will never contain position information
+// - The system should retrieve the previous target from the database
+//   to populate this track message.
+//
+// Example: AIS static voyage message
+//
+message TrackMetadata {
+    // Time at which this target data was sensed. (Best-guess time when
+    // multiple sources, e.g. ingest time vs. TV32 time)
+    google.protobuf.Timestamp time = 2;
+    // The time at which the data ingest daemon saw this data
+    google.protobuf.Timestamp ingest_time = 3;
+
+    // The device type from which this data was absorbed
+    prisma.tms.devices.DeviceType type = 4;
+
+    string name = 5;
+    string call_sign = 6;
+    string destination = 7;
+
+    prisma.tms.nmea.Nmea nmea = 100;
+    prisma.tms.tv32.TV32Data tv32 = 101;
+}
+
+message SafetyBroadcast {
+    string  mmsi = 1;
+
+    // Time at which this target data was sensed. (Best-guess time when
+    // multiple sources, e.g. ingest time vs. TV32 time)
+    google.protobuf.Timestamp time = 2;
+    // The time at which the data ingest daemon saw this data
+    google.protobuf.Timestamp ingest_time = 3;
+
+    // The device type from which this data was absorbed
+    prisma.tms.devices.DeviceType type = 4;
+
+    string text = 5;
+
+    prisma.tms.nmea.Nmea nmea = 100;
+}
+
+// Arbitrary amount of static & dynamic track. Info could be historical data or
+// multi-sensor data, depending on the track type
+message Track {
+    string database_id = 1;  // Database identifier
+    string id = 2;
+    string registry_id = 12;
+    SensorID producer = 3;
+
+    // Don't add anything else to this guy. You'll regret it. Basic reason is
+    // that some steps in the track stream code assume that it can be torn
+    // apart into just targets and metadata then reassembled. If you want to
+    // add anything here, you'll have to find and fix that code.
+    repeated Target targets = 10;
+    repeated TrackMetadata metadata = 11;
+}
+
+message TrackExReq {
+    Track track = 1;
+    string registry_id = 2;
+    int32 count = 10;
+}

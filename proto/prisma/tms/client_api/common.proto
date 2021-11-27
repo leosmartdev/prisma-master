@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package prisma.tms.client_api;
+
+enum Status {
+    // Default
+    Unknown = 0;
+
+    // Object has been newly inserted or updated
+    Current = 1;
+
+    // Object has become stale 
+    Stale = 2;
+
+    // Object has become invalid due to time (it expired)
+    Timeout = 3;
+
+    // Object left geographic range in query
+    LeftGeoRange = 4;
+
+    // The initial load of tracks/object is done, switching to live/retrack
+    // streaming
+    InitialLoadDone = 5;
+
+    // Starting a stream. Optionally emitted
+    Starting = 6;
+
+    // Stream is closing. Optionally emitted
+    Closing = 7;
+
+    // Indicates that a setup is completed. Specific meaning is context dependent.
+    SetupDone = 8;
+
+    // Switching to sending heatmap updates
+    HeatmapStart = 9;
+
+    // Switching back to sending normal updates
+    HeatmapStop = 10;
+
+    // Heatmap document
+    Heatmap = 11;
+
+    // No feature or heatmap is in this update, only a new count
+    CountOnly = 12;
+
+    // Message was queued
+    Queued = 13;
+
+    History = 14;
+    HistoryStart = 15;
+    HistoryStop = 16;
+    HistoryClearAll = 17;
+
+}

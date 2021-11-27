@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+import "prisma/tms/devices/devices.proto";
+import "prisma/tms/target_track.proto";
+
+message RegistryEntry {
+    // A canonical identifier
+    string registry_id = 1;
+    string database_id = 51;
+    string label = 58;
+    string label_type = 59;
+
+    // device type
+    prisma.tms.devices.DeviceType device_type = 3;
+    // Does this registry entry redirect to another?
+    bool redirect = 4;
+    // Single target, may be merged/fused from multiple other targets
+    Target            target = 20;
+    // Pointers to the targets from which this targets was merged/fused
+    repeated Target   target_sources = 21;
+    // Single metadata, may be merged/fused from multiple other metadata
+    TrackMetadata          metadata = 30;
+
+    // Values that this entry can be searched bu
+    repeated string keywords = 54;
+    // The keywords are composed using the fields listed here
+    repeated SearchField target_fields = 56;
+    repeated SearchField metadata_fields = 57;
+    
+    // The User-entered registration information
+    Assignment assignment = 52;
+
+    // Incidents this object belongs to
+    repeated string incidents = 53;
+}
+
+message SearchField {
+    string name = 1;
+    string value = 2;
+}
+
+message MatchField {
+    string name = 1;
+    string value = 2;
+    bool highlight = 3;
+}
+
+message Assignment {
+    string type = 7;
+    string lookup = 8;
+
+    // The label used to identify the device (can be the name of the vessel, owner etc.)
+    string label = 2;
+    bool in_fleet = 6;
+    string fleet_id = 5;
+    // ... Other user-entered fields can be added here
+}

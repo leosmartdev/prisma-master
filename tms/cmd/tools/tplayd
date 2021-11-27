@@ -1,0 +1,394 @@
+#!/usr/bin/python
+
+import os
+import re
+import socket
+import struct
+import sys
+import threading
+import time 
+import Queue 
+from Queue import Full, Empty 
+
+class BlockingQueue:
+    def __init__(self, maxSize=50):
+        self.maxSize = maxSize
+#        self.lock = threading.Lock() # for thread locking
+#        self.event = threading.Event() # for polling
+        self.queue = Queue.Queue(self.maxSize)
+
+    def poll(self):
+        # Returns an object from the queue or waits until there
+        # is an object on the queue to return
+        return self.queue.get(block=True)
+#        try:
+#            object = None
+#            #log.info("wait (%s)", self.event.isSet())
+#            if not self.event.wait():
+#                #log.info("acquire")
+#                if self.lock.acquire(True):
+#                    #log.info("pop")
+#                    # we have lock, and a non-empty list
+#                    object = self.queue.pop(0)
+#                    self._updateEvent()
+#                    self.lock.release()
+#                    return object
+#        except threading.ThreadError, err:
+#            log.error("Lock broken %s", err)
+#            raise err
+
+#    def _updateEvent(self):
+#        # If the queue is empty set false, true otherwise
+#        # the event flag:
+#        # set false by clear()
+#        # set true by set()
+#        if len(self.queue) > 0:
+#            self.event.set() # we have data go process it
+#        else:
+#            self.event.clear() # no data, stop processing
+#        #log.info("len=%s event=%s", len(self.queue), self.event.isSet())
+
+    def append(self, obj):
+        # Appends an object to the queue
+        self.queue.put_nowait(obj)
+
+#        try:
+#            if self.lock.acquire(True):
+#                # we have lock, append to end of list
+#                self.queue.append(object)
+#                self._updateEvent()
+#                self.lock.release()
+#        except threading.ThreadError, err:
+#            log.error("Lock broken %s", err)
+#        finally:
+#            #self._updateEvent()
+#            pass
+
+    def size(self):
+        return self.queue.qsize()
+
+
+class Service(threading.Thread):
+    def __init__(self, serviceSocket, address):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.serviceSocket = serviceSocket
+        self.address = address
+        self.queue = BlockingQueue(maxSize=1000)
+
+        # set the server socket to nonblocking
+        #self.serviceSocket.setblocking(False)
+
+    def append(self, object):
+        try:
+            self.queue.append(object)
+        except Full:
+            pass
+
+    def queued(self):
+        """Returns approx size of queue"""
+        return self.queue.size()
+
+    def run(self):
+        try:
+            while True:
+                sentence = self.queue.poll()
+                self.serviceSocket.send(sentence)
+        except socket.error, (errNum, msg):
+            pass #log.error("%s: Socket error(%s): %s", self.address, errNum, msg)
+        except SystemError, e:
+            #log.error("%s: Unexpected error: %s", 
+            #    self.address, e)
+            raise
+        finally:
+            try:
+                self.serviceSocket.close()
+            except:
+                pass
+            #log.info("%s: client disconnected", self.address)
+
+
+class Server(threading.Thread):
+    def __init__(self, name, port):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.setName(name)
+        self.serverName = name
+        self.port = port
+        self.services = list()
+
+        try:
+            ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.configureSocket(ls)
+            ls.bind(('', port)) # Empty string = INADDR_ANY
+            ls.listen(5)
+            self.listenSocket = ls 
+        except socket.error, (errorNumber, message):
+            #log.error("%s: Unable to listen on port %s: %s", 
+            #    name, port, message)
+            sys.exit(1)
+
+    def configureSocket(self, s):
+        # Don't let the socket linger on close so that it closes immediately
+        # and doesn't sit around in TIME_WAIT state and block the server
+        # from restarting.
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, 
+                     struct.pack('ii', 1, 0))
+
+    def append(self, object):
+        # walk list of clients and append object to their process queue
+        #log.info("%s: Appending sentence to %s clients", 
+        #    self.serverName, len(self.services))
+        for service in self.services:
+            if service.isAlive():
+                service.append(object)
+            else:
+                #log.info("Removing disconnected service thread")
+                self.services.remove(service)
+
+    def queued(self):
+        """Return number of approximate queued objects"""
+        return sum([service.queued() for service in self.services])
+
+    def run(self):
+        #log.info("%s: Server started on port %s", 
+            #self.serverName, self.port)
+
+        try:
+            # sit and listen for incoming connections, spawning
+            # client threads for each connection.
+            while True:
+                (serviceSocket, address) = self.listenSocket.accept()
+                self.configureSocket(serviceSocket)
+                # First value in address tuple is the actual IP addy
+                service = Service(serviceSocket, address[0])
+                service.start()
+                self.services.append(service)
+        except SystemError, e:
+            #log.error("%s: Unexpected error: %s", 
+                #self.serverName, e)
+            raise
+        finally:
+            try:
+                #log.info("Server socket shutdown")
+                self.listenSocket.close()
+            except socket.error, (errorNumber, message):
+                pass
+                #log.error("%s: Error closing socket: %s", 
+                    #self.serverName,message)
+            #log.info("%s: Server shutdown", self.serverName)
+
+
+class DumpFiles:
+    def __init__(self, filedir):
+        if not os.path.exists(filedir):
+            raise Exception("File/directory does not exist: "+filedir)
+
+        self._path = filedir
+        self._isfile = os.path.isfile(filedir)
+        self._isdir = os.path.isdir(filedir)
+        self._filelist = []
+        self._current = -1
+
+        listing = []
+        if self._isfile:
+            listing.append(self._path)
+        elif self._isdir:
+            x = [os.path.join(self._path, ent) 
+                    for ent in os.listdir(self._path)]
+            listing.extend(x)
+
+        nmea_matcher = re.compile(r'[$!][A-Z]{5},')
+        time_matcher = re.compile(r'^(\d+\.\d+)')
+        dumps = []
+        dumphash = {}
+        for fentry in listing:
+            if not os.path.isfile(fentry):
+                continue # skip non-files
+            fh = open(fentry, 'r')
+            for line in fh:
+
+                # if we find a file which contains an obvious nmea entry
+                m = nmea_matcher.search(line)
+                if m:
+                    dumps.append(fentry)
+
+                    # if we can sort it this entry
+                    m = time_matcher.search(line)
+                    if m:
+                        (lineTime,) = m.groups()
+                        dumphash[fentry] = float(lineTime)
+                    else:
+                        dumphash[fentry] = 0.0
+
+                    # stop processing once we know its got nmea
+                    break;
+        dumps.sort(key=dumphash.__getitem__)
+        self._filelist.extend(dumps)
+
+        if len(self._filelist) == 0:
+            raise Exception("No NMEA files found")
+
+    def getNextFile(self):
+        self._current += 1
+        self._current %= len(self._filelist)
+        return self._filelist[self._current]
+
+
+class DumpReader:
+    def __init__(self, filename):
+        #log.info("Loading file: %s", filename)
+        self._fh = open(filename, 'r')
+        # match nmea capture
+        self._nmea_matcher = re.compile(r'([$!][A-Z]{5},[^ \r\n]*)')
+        # match tbfd capture
+        self._bf_hex_matcher = re.compile(r'0x([A-Fa-f0-9]*)\n')
+        # orbcomm
+        self._orbcomm_time_matcher = re.compile(r'c:(\d+)')
+        # normal nmea file
+        self._time_matcher = re.compile(r'^(\d+\.?\d*)')
+        self._R1_time = None
+        self._Rn1_time = None
+        self._C1_time = None
+        self._Cn1_time = None
+
+    def readline(self):
+        for line in self._fh:
+            rawdata = None
+
+            # test if line contains nmea data
+            nm = self._nmea_matcher.search(line)
+            if nm:
+                (rawdata,) = nm.groups()
+            else:
+                # not nmea? maybe its BF hex?
+                bf = self._bf_hex_matcher.search(line)
+                if bf:
+                    (bfraw,) = bf.groups()
+                    rawdata = bytearray.fromhex(bfraw)
+
+            # we found readable data, what about timestamp?
+            if rawdata != None:
+                rawtime = None
+                tm = self._time_matcher.search(line)
+                if tm:
+                    (rawtime,) = tm.groups()
+                else:
+                    tm = self._orbcomm_time_matcher.search(line)
+                    if tm:
+                        (rawtime,) = tm.groups()
+                interval = self.interval_update(rawtime)
+
+                yield [rawdata, interval]
+
+        self._fh.close()
+        return
+
+    def interval_update(self, rawtime):
+        if rawtime is None:
+            Rn_time = 0.0
+        else:
+            Rn_time = float(rawtime)
+
+        #
+        # R |---|----|--------->
+        # C |---|----|--------->
+        #       1....n
+        # R     -> the function of time as run by the program
+        # C     -> the function of time as run by the system
+        # 1..n  -> the "marked" times to send a nmea
+        # 
+        # lag   -> (R(n) - R(1)) - (C(n) - C(1))
+        #          seconds lost by the program due to execution
+        # ival  -> R(n) - R(n-1)
+        #          the basic amount of time the program should
+        #          sleep between transmission of nmea
+        # ival2 -> R(n) - R(n-1) + lag
+        #          the amount of time the program should sleep
+        #          between transmission offset by the program lag
+        #
+
+        # find the interval of wait time
+        if self._R1_time is None:
+            interval = 0.0
+            self._R1_time = Rn_time
+            self._Rn1_time = Rn_time
+            self._C1_time = time.time()
+            self._Cn1_time = time.time()
+        else:
+            # NOTE fix to read files with combination of
+            #      timestamp/notimestamp -- Bob Naugle
+            # NOTE should this be moved up to the top
+            #      of the function? -- Pete Cooner
+            if Rn_time == 0.0:
+                Rn_time = self._Rn1_time + 0.001
+
+            #print "%s - %s" % (Rn_time, self._Rn1_time)
+            interval = Rn_time - self._Rn1_time
+            self._Cn1_time = time.time()
+            self._Rn1_time = Rn_time
+            
+        # offset the wait time by the lag of the machine
+        interval += self.lag()
+        if interval < 0.0:
+            interval = 0.0
+
+        return interval
+
+
+    def lag(self):
+        # calc the lag, but special case for when there are no timestamps
+        # for each line present
+        Rd = self._Rn1_time - self._R1_time
+        if Rd == 0:
+            return 0
+        Cd = self._Cn1_time - self._C1_time
+        return Rd - Cd
+
+
+def fileReadLoop(server, filedir):
+    dumps = DumpFiles(filedir)
+
+    lines = 0
+    last_log_lines = 0
+    last_log_time = time.time()
+
+    while True:
+        fn = dumps.getNextFile()
+        reader = DumpReader(fn)
+        for (nmea, ival) in reader.readline():
+
+            lines += 1
+            last_log_lines += 1
+            if time.time()-last_log_time > 60:
+
+                print "In %s minutes transmited %d lines (%d total) with %s lag and ~%d queued" % (
+                    int((time.time()-last_log_time)/60),
+                    last_log_lines,
+                    lines,
+                    reader.lag(),
+                    server.queued())
+                last_log_time = time.time()
+                last_log_lines = 0
+
+            server.append(nmea + "\r\n")
+            time.sleep(ival)
+
+def main(argv):
+    if len(argv) < 3:
+        print "Usage: %s <input file/dir> <port>" % argv[0]
+        sys.exit(1)
+
+    file_dir = argv[1]
+    port = int(argv[2])
+
+    server = Server("nmea", port)
+    server.start()
+    print "Server started ok"
+
+    fileReadLoop(server, file_dir)
+
+
+if __name__=="__main__":
+    main(sys.argv)
+

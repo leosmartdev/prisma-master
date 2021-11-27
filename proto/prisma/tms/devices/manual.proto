@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package prisma.tms.devices;
+
+message ManualDevice {
+    // If true, stop plotting this placemark on the map
+    bool issue_timeout = 1;
+}

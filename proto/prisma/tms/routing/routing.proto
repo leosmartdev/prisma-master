@@ -1,0 +1,98 @@
+//
+// Copyright 2010 Techno-Sciences Inc.  All Rights Reserved.
+//
+// Techno-Sciences
+// 11750 Beltsville Dr.
+// Beltsville MD  20705
+//
+syntax = "proto3";
+import "prisma/tms/message.proto";
+import "google/protobuf/timestamp.proto";
+
+package prisma.tms.routing;
+
+option java_package="com.technosci.tms.message";
+
+//
+// routing messages used for route discovery, timings, etc
+//
+// message types 1001-1999
+//
+
+// Used by tgwad to find latency of a connection / client.
+message Ping {
+    google.protobuf.Timestamp ping_send_time = 1;
+    google.protobuf.Timestamp pong_send_time = 2;
+}
+
+// Used by tgwad to define what the client is interested in recieving
+// message wise. The message_type variable is the magic constant in the
+// google-protobuf message-type system, specifically it is the extension
+// number used/referenced in TsiMessage's extension list.
+message Listener {
+    prisma.tms.EndPoint source = 1; 
+    prisma.tms.EndPoint destination = 2;
+    string message_type = 3;
+}
+
+// A group of listeners
+message Registry {
+    prisma.tms.EndPoint source_service = 1;
+    repeated Listener entries = 2;
+}
+
+// Used for tgwad to tgwad connections for conveying routing infos
+message Route {
+    enum Status {
+        UNKNOWN = 0;
+
+        DISABLED = 100;
+        DOWN = 101;
+
+        RETRY = 1;
+        UP = 2;
+        REMOTE = 3;
+    }
+
+    string url = 5;
+    Status status = 6;
+}
+
+// send to different tms processes and other tgwads
+// NOTE The repeat_max is the longest (in sec) time / period between
+//      msgs so long as tgwad isn't too busy to send
+message ServiceInfo {
+    //repeated Route routes = 1;
+    repeated SiteInfo sites = 2;
+    repeated prisma.tms.EndPoint services = 3;
+    double repeat_max = 4;
+}
+
+message SiteInfo {
+    uint32 id = 1;
+    string name = 2;
+    bool   local = 3;   // True if this is our local site
+    bool   gateway = 4; // True if this is our upstream site
+
+    repeated Route routes = 5; // List of ways to access this site
+}
+
+// sent to tgwad from other tms processes
+// informs tgwad about the state of other proceses, ie latency
+message ServiceStatus {
+    enum RequestType {
+        ENDPOINT = 0; // a specified endpoint
+        ALL = 1;      // for all services
+    }
+
+    message Status {
+        int64 service_id = 1; // NOTE: internal tgwad use only
+        prisma.tms.EndPoint source = 2;
+        map<string, string> entries = 3;
+    }
+
+    RequestType request = 1;
+    repeated Status status = 2;
+}
+
+

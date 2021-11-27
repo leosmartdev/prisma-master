@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package prisma.tms.client_api;
+
+option java_package = "mcm.proto.client";
+option java_outer_classname = "MiscData";
+
+import "prisma/tms/client_api/common.proto";
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+/*
+ * Determining the table to use:
+ *  1) If "object_type" is specified, tclientd will resolve the table name
+ *     based on the type string specified here.
+ *  2) If neither are specified and "obj" contains data, its data type will be
+ *     used for table resolution.
+ *
+ * If a method fails (e.g. table name specified doesn't exist, type cannot be
+ * resolved) then an error is returned. The resolver will NOT fall through to
+ * the next option.
+ */
+message Request {
+    // Instead of table, the object type can be specified here.
+    string object_type = 2;
+
+    // Only return data older than 'timeMax'. If not specified, show latest.
+    google.protobuf.Timestamp replayTime = 3;
+
+    // Speed up or slow down replay? Increase the speed by this factor. Only
+    // positive values are valid (no rewind). Only valid when replayTime is
+    // specified.
+    double replaySpeed = 4;
+
+    // A protobuf object to insert/update (for Upsert) or containing filtering
+    // fields (for Get/GetStreaming).
+    Object obj = 10;
+
+    // For Expire(), should this affect all of the open entries in the table?
+    // If true, ignore the 'obj.id' field.
+    bool   expire_all = 5;
+
+    // For Get(), ignore expire & creation times. Return everything in the
+    // database across all time.
+    bool   ignore_time = 6;
+
+}
+
+// A "misc" object. This message contains the core properties of all objects
+// plus an embedded object "Any" with arbitrary properties.
+message Object {
+    // An object identifier. Unique in each database. If blank, the database
+    // will assign one on upsert. 
+    string id = 1;
+
+    // The time at which this object was created or became valid
+    google.protobuf.Timestamp creation_time = 2;
+
+    // The time at which this object will become or became invalid
+    google.protobuf.Timestamp expiration_time = 3;
+
+    // If this object is associated with a registry entry somehow, populate
+    // this guy with that entry's ID.
+    string registry_id = 6;
+
+    // A protobuf object containing embedded data. Can be any protobuf message
+    // type.
+    google.protobuf.Any data = 11;
+}
+
+message GetResponse {
+    // The object DB status. On a normal get, this will always be NewValue.
+    // Only matters for streaming requests.
+    Status status = 1;
+
+    // What table is this object coming from. Should match the value in the request.
+    string    table = 2;
+
+    // The object's core properties and object itself
+    Object    contents = 6;
+}
+
+message GetResponses {
+    // Array of responses
+    repeated GetResponse responses = 1;
+}
+
+message UpsertResponse {
+    // Was the object added new or updated?
+    Status status = 1;
+
+    // To what table was the object added
+    string    table = 2;
+
+    // The database ID of the object which was upserted
+    string    id = 3;
+}
+
+message ExpireResponse {
+    // The time the server marked the objects expired at
+    google.protobuf.Timestamp expiration_time = 1;
+
+    // Number of objects which were marked expired
+    uint32 num_objs = 2;
+}
+
+message DeleteFleetRequest {
+    string id = 1;
+}
+
+message DeleteFleetResponse {
+    bool found = 1;
+    uint32 orphaned = 2;
+}

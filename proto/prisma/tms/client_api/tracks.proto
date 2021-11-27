@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package prisma.tms.client_api;
+
+option java_package = "mcm.proto";
+option java_outer_classname = "Client";
+
+import "prisma/tms/client_api/common.proto";
+
+import "prisma/tms/common.proto";
+import "prisma/tms/target_track.proto";
+import "prisma/tms/devices/devices.proto";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+enum MergeMode {
+    // Merge when a global identifier can be used. (E.g. merge by MMSI)
+    UniversalID = 0;
+
+    // Merge targets/metadata only if track_id matches
+    TrackID = 1;
+
+    // Disable the merge
+    None = 2;
+}
+
+enum RequestMode {
+    Standard = 0;
+    Search = 1;     
+}
+
+message TrackRequest {
+    // Only return data older than 'timeMax'. If not specified, show latest.
+    google.protobuf.Timestamp replayTime = 1;
+
+    // Speed up or slow down replay? Increase the speed by this factor. Only
+    // positive values are valid (no rewind). Only valid when replayTime is
+    // specified. (Defaults to 1.0)
+    double replaySpeed = 3;
+
+    // Include history or only latest target? If including history, for how
+    // long into the past relative to timeMax?
+    google.protobuf.Duration history = 2;
+
+    // What subset of tracks do we want?
+    oneof filter {
+        FilterSimple filter_simple = 10;
+    }
+
+    // How should different tracks be merged, if at all? This acts a lot like a
+    // 'group by' clause in SQL. By default, merge by track_id.
+    MergeMode merge = 30;
+
+    // Limit the numer of results 
+    int32 limit = 31;
+
+    RequestMode mode = 33;
+}
+
+// Select a subset of data based on these conditions AND'ed together. Repeated
+// fields (e.g. device_type) are OR'ed together. Also, all geo fields are OR'ed
+// together. This type of filter is intended to be convenient.
+message FilterSimple {
+    // Return data about these targets only
+    repeated prisma.tms.TargetID targets = 1;
+
+    // Return data about these tracks only
+    repeated string tracks = 2;
+
+    // Return data about tracks that have these registry identifiers 
+    repeated string registries = 12;
+
+    // Only return data from these device types. If not specified, show all.
+    repeated prisma.tms.devices.DeviceType device_type = 5;
+
+    // Give me data only from these sensors only
+    repeated prisma.tms.SensorID sensors = 6;
+
+    // Data from these sites only
+    repeated uint32 sites = 7; 
+
+    // Targets in this circular area only
+    repeated CircularRange circular_range = 8;
+
+    // Targets with lat/long ranges only
+    repeated LinearRange linear_range = 9;
+
+    // Targets with names starting with this text
+    string text = 11;
+}
+
+message CircularRange {
+    prisma.tms.Point center = 1;
+    double radius = 2; // In nautical miles (nm)
+}
+
+message LinearRange {
+    google.protobuf.DoubleValue max_latitude = 1;
+    google.protobuf.DoubleValue min_latitude = 2;
+
+    google.protobuf.DoubleValue max_longitude = 3;
+    google.protobuf.DoubleValue min_longitude = 4;
+}
+
+message Tracks {
+    repeated prisma.tms.Track tracks = 1;
+}
+
+message TrackUpdate {
+    Status status = 1;
+    prisma.tms.Track track = 2;
+}
+
+message HistoricalTrackRequest {
+    string databaseId = 2;
+}

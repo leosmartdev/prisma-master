@@ -1,0 +1,75 @@
+{
+  "builders": [
+    {
+      "type": "docker",
+      "image": "armv7/armhf-ubuntu:xenial",
+      "export_path": "image.tar"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "apt-get update",
+        "apt-get install -yq vim build-essential python-minimal git curl sudo locales rsyslog xvfb libgtk2.0-0 libxtst6 libxss1 gconf2 libnss3 libasound2 scons libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev cmake zlib1g-dev unzip autoconf automake libtool"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "curl --silent -O -L https://dl.google.com/go/go1.10.1.linux-armv6l.tar.gz",
+        "tar xf go*.tar.gz"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "git clone https://github.com/Softmotions/ejdb.git",
+        "cd ejdb",
+        "mkdir build",
+        "cd build",
+        "cmake -DCMAKE_BUILD_TYPE=Release ../",
+        "make install",
+        "ldconfig"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "curl --silent -O -L https://github.com/google/protobuf/archive/v3.5.0.tar.gz",
+        "tar xf v3*.tar.gz",
+        "cd protobuf*",
+        "./autogen.sh",
+        "./configure",
+        "make install",
+        "ldconfig"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "../../vagrant/go.sh",
+      "destination": "/opt/go.sh"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /root",
+        "mkdir go",
+        "mkdir go/src",
+        "cd /opt",
+        "chmod a+x *.sh",
+        "cp go.sh /etc/profile.d"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "docker-import",
+      "repository": "orolia/prisma/armhf-ubuntu-build",
+      "tag": "latest"
+    }
+  ]
+}

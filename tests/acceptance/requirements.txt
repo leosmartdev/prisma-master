@@ -1,0 +1,4 @@
+pymongo
+requests
+websockets==7.0
+boto3

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SERVICE_USER=prisma
+
+if ! $(id $SERVICE_USER >/dev/null 2>&1) ; then
+    useradd $SERVICE_USER
+fi
+install -o mongodb -g mongodb -d /var/trident
+install -o mongodb -g mongodb -d /var/trident/db
+
+systemctl daemon-reload
+systemctl restart mongod
+systemctl enable mongod
+
+sleep 20s
+mongo localhost:27017 /etc/trident/db/replication.js
+sleep 20s
+mongo localhost:27017/aaa /usr/share/tms-db/mongo/schema/aaa.js
+sleep 20s
+mongo localhost:27017/trident /usr/share/tms-db/mongo/schema/trident.js
+

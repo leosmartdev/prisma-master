@@ -1,0 +1,423 @@
+{
+    "objects": [
+        {
+            "device": "sarsat",
+            "beacon_id": "A029C2900D97591",
+            "pos": [
+                {
+                    "latitude": 10,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "9B7B2059560E9D1",
+            "pos": [
+                {
+                    "latitude": 10.05,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.05,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "A786492E70174C1",
+            "pos": [
+                {
+                    "latitude": 10.1,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.1,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "BEEC0358DC00001",
+            "pos": [
+                {
+                    "latitude": 10.15,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.15,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "ADCCB8E29D80001",
+            "pos": [
+                {
+                    "latitude": 10.2,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.2,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "ADCDABC3C3C0001",
+            "pos": [
+                {
+                    "latitude": 10.25,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.25,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "A22E00027000000",
+            "pos": [
+                {
+                    "latitude": 10.3,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.3,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "A22F03504400001",
+            "pos": [
+                {
+                    "latitude": 10.35,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.35,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "BBAD5EE4A400191",
+            "pos": [
+                {
+                    "latitude": 10.4,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.4,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "2024F72524FFBFF",
+            "pos": [
+                {
+                    "latitude": 10.45,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.45,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "202600157800000",
+            "pos": [
+                {
+                    "latitude": 10.5,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.5,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "202805001600000",
+            "pos": [
+                {
+                    "latitude": 10.55,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.55,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "202C05001600000",
+            "pos": [
+                {
+                    "latitude": 10.6,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.6,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "202E05001600000",
+            "pos": [
+                {
+                    "latitude": 10.65,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.65,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "202B89B81600000",
+            "pos": [
+                {
+                    "latitude": 10.7,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.7,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "20383C480000000",
+            "pos": [
+                {
+                    "latitude": 10.75,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.75,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "20341500BF81FE0",
+            "pos": [
+                {
+                    "latitude": 10.8,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.8,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "ADCC404C8400315",
+            "pos": [
+                {
+                    "latitude": 10.85,
+                    "longitude": 10,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10.85,
+                    "longitude": 10.9,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 1,
+            "time_cs_confirmed_sec": 2,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            }
+        },
+        {
+            "device": "sarsat",
+            "beacon_id": "ADC667150EFE241",
+            "pos": [
+                {
+                    "latitude": 10,
+                    "longitude": 9.8,
+                    "speed": 5
+                },
+                {
+                    "latitude": 10,
+                    "longitude": 9.0,
+                    "speed": 5
+                }
+            ],
+            "time_cs_located_sec": 2,
+            "time_cs_confirmed_sec": 99999999999,
+            "time_recreate_sec": 99999999999,
+            "time_config": {
+                "sleep_get_info_position": 1
+            },
+            "error_point_nm": 0.025
+        }
+    ]
+}

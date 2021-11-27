@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<topMessage>
+    <header dest="2780" orig="2580" number="13859" date="2015-10-09T19:46:28Z" />
+    <message>
+        <incidentAlertMessage>
+            <header>
+                <siteId>27206</siteId>
+                <beacon>ADC667150EFE241</beacon>
+            </header>
+            <elemental>
+                <satellite>10</satellite>
+                <orbitNumber>48374</orbitNumber>
+                <tca>2014-10-09T13:10:26.848Z</tca>
+                <dopplerA probability="59">
+                    <location latitude="-2.8900" longitude="110.2116" />
+                </dopplerA>
+                <dopplerB>
+                    <location latitude="-2.8906" longitude="110.2111" />
+                </dopplerB>
+            </elemental>
+        </incidentAlertMessage>
+    </message>
+</topMessage>

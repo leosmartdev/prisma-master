@@ -1,0 +1,406 @@
+{
+  "time_config": {
+    "sleep_get_info_position": 1
+  },
+  "sarsat": {
+    "time_cs_located_sec": 1,
+    "time_cs_confirmed_sec": 2,
+    "time_recreate_sec": 2,
+    "zone": {
+      "top": 1,
+      "bottom": 0,
+      "left": 0,
+      "right": 1
+    }
+  },
+  "objects": [
+    {
+      "device": "ais",
+      "mmsi": 970000001,
+      "navigation_status": 14,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.9,
+          "longitude": 104.0,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 970000002,
+      "navigation_status": 15,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.9,
+          "longitude": 104.0,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 970000001,
+      "navigation_status": 14,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.9,
+          "longitude": 104.0,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 972000001,
+      "navigation_status": 14,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.8,
+          "longitude": 104.0,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 972000002,
+      "navigation_status": 15,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.8,
+          "longitude": 104.1,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 974000001,
+      "navigation_status": 15,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.7,
+          "longitude": 104.0,
+          "speed": 15
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 974000002,
+      "navigation_status": 15,
+      "time_config": {
+        "sleep_get_info_position": 10
+      },
+      "pos": [
+        {
+          "latitude": 0.7,
+          "longitude": 104.1,
+          "speed": 15
+        }
+      ]
+    },
+
+
+
+
+
+    {
+      "device": "sarsat",
+      "beacon_id": "test0",
+      "pos": [
+        {
+          "latitude": 6,
+          "longitude": 1,
+          "speed": 100
+        },
+        {
+          "latitude": 1.174031,
+          "longitude": 103.141706
+        }
+       ],
+       "time_cs_located_sec": 2,
+       "time_cs_confirmed_sec": 2,
+       "time_recreate_sec": 1,
+        "error_point_nm": 0.2
+    },
+    {
+      "device": "sarsat",
+      "beacon_id": "test1",
+      "pos": [
+        {
+          "latitude": 1,
+          "longitude": 2,
+          "speed": 50
+        },
+        {
+          "latitude": 1.174031,
+          "longitude": 103.141706
+        }
+      ],
+      "time_cs_located_sec": 5,
+      "time_cs_confirmed_sec": 5,
+      "error_point_nm": 0.2
+    },{
+      "device": "sarsat",
+      "beacon_id": "test2",
+      "pos": [
+        {
+          "latitude": 1.179031,
+          "longitude": 103.161706
+        }
+      ],
+      "elemental": [
+        {
+          "dopplerA": {
+            "latitude": 1.178031,
+            "longitude": 103.161706
+          },
+          "dopplerB": {
+            "latitude": 1.171931,
+            "longitude": 103.161706
+          }
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 235009802,
+      "destination": "RU",
+      "name": "TESTA",
+      "eta": "02101504",
+      "type": 58,
+      "pos": [
+        {
+          "latitude": 1.170931,
+          "longitude": 103.141706,
+          "speed": 15
+        },
+        {
+          "latitude": 1.170931,
+          "longitude": 103.803754,
+          "speed": 14
+        },
+        {
+          "latitude": 1.100931,
+          "longitude": 104.303754,
+          "speed": 11
+        },
+        {
+          "latitude": 1.100931,
+          "longitude": 103.143754,
+          "speed": 21
+        },
+        {
+          "latitude": 2.100931,
+          "longitude": 103.143754,
+          "speed": 31
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 235009891,
+      "destination": "RU",
+      "type": 30,
+      "name": "TESTB",
+      "eta": "02091504",
+      "pos": [
+        {
+          "latitude": 1.172931,
+          "longitude": 103.141706,
+          "speed": 163.8
+        },
+        {
+          "latitude": 1.162931,
+          "longitude": 102.511706
+        }
+      ]
+    },
+    {
+      "device": "radar",
+      "name": "RADARA",
+      "destination": "RU",
+      "pos": [
+        {
+          "latitude": 1.172931,
+          "longitude": 103.041706,
+          "speed": 60
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 103.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.181931,
+          "longitude": 102.903754,
+          "speed": 6.5
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 235009814,
+      "destination": "RU",
+      "type": 43,
+      "name": "TESTD",
+      "eta": "02091504",
+      "pos": [
+        {
+          "latitude": 1.181931,
+          "longitude": 102.403754,
+          "speed": 6.5
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 102.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.172931,
+          "longitude": 102.841706,
+          "speed": 6
+        }
+      ]
+    },
+    {
+      "device": "radar",
+      "name": "RADARB",
+      "pos": [
+        {
+          "latitude": 1.173931,
+          "longitude": 103.141706,
+          "speed": 10
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 102.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.172931,
+          "longitude": 102.841706,
+          "speed": 6
+        }
+      ]
+    },
+    {
+      "device": "radar",
+      "name": "RADARC",
+      "pos": [
+        {
+          "latitude": 1.171931,
+          "longitude": 103.153754,
+          "speed": 20
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 102.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.172931,
+          "longitude": 102.841706,
+          "speed": 6
+        }
+      ]
+    },
+    {
+      "device": "ais",
+      "mmsi": 235009899,
+      "destination": "RU",
+      "type": 30,
+      "name": "TESTAC",
+      "eta": "02091504",
+      "pos": [
+        {
+          "latitude": 2.351931,
+          "longitude": 102.803754,
+          "speed": 50
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 102.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.172931,
+          "longitude": 102.841706,
+          "speed": 6
+        }
+      ]
+    },
+    {
+      "device": "omnicom",
+      "imei": "P00234010030450",
+      "reportperiod": 1,
+      "pos": [
+        {
+          "latitude": 2.351931,
+          "longitude": 102.703754,
+          "speed": 40
+        },
+        {
+          "latitude": 1.151931,
+          "longitude": 102.903754,
+          "speed": 7
+        },
+        {
+          "latitude": 1.173931,
+          "longitude": 103.401706,
+          "speed": 8
+        },
+        {
+          "latitude": 1.172931,
+          "longitude": 102.841706,
+          "speed": 6
+        }
+      ]
+    }
+  ]
+}

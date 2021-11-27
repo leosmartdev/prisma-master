@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+import "prisma/tms/omnicom/Omnicom.proto";
+import "google/protobuf/timestamp.proto";
+
+message OutgoingMessage {
+    // Time at which this message was created.
+    google.protobuf.Timestamp time = 4;
+
+    // List of track_ids (destinations to which the message should be sent)
+    repeated string track_ids = 2;
+
+    // Send to all? (Not implemented right now)
+    // bool send_to_all = 3;
+
+    // Message payload - Omnicom
+    prisma.tms.omnicom.Omni omnicom = 11;
+
+    // ... other message payloads
+}

@@ -1,0 +1,72 @@
+#!/usr/bin/python
+
+import argparse
+import json
+
+import requests
+import time
+from expects import *
+
+requests.packages.urllib3.disable_warnings()
+
+AUTH = 'https://localhost:8181/api/v2/auth'
+HEADERS = {'Content-Type': 'application/json'}
+
+
+class Session(requests.Session):
+    def request(self, method, url, **kwargs):
+        return super().request(method, url, verify=False, **kwargs)
+
+
+# Instantiate the parser
+parser = argparse.ArgumentParser(description='Getting and setting the policy')
+parser.add_argument('-u', help='admin')
+parser.add_argument('-p', help='admin')
+parser.add_argument('-set', action='store_true', help='')
+parser.add_argument('-get', action='store_true', help='')
+parser.add_argument('-file', help='/path/to/policy.json')
+
+
+def main():
+    args = parser.parse_args()
+    session = get_session(args.u, args.p)
+
+    if args.get:
+        get_policy(session)
+
+    if args.set:
+        pfile = args.file
+        if pfile != None:
+            text_file = open(pfile, "r")
+            policy = text_file.read()
+            text_file.close()
+            set_policy(session, policy)
+
+
+def get_session(name, password):
+    session = Session()
+    rsp = session.post(AUTH + '/session', json.dumps({
+        'userName': name,
+        'token': password,
+    }), headers=HEADERS)
+    expect(rsp.status_code).to(equal(200))
+    return session
+
+
+def get_policy(session):
+    rsp = session.get(AUTH + '/policy', headers=HEADERS)
+    expect(rsp.status_code).to(equal(200))
+    obj = json.loads(rsp.text)
+    ts = int(time.time())
+    text_file = open("policy_" + str(ts) + ".json", "w")
+    text_file.write(rsp.text)
+    text_file.close()
+
+
+def set_policy(session, policy):
+    rsp = session.put(AUTH + '/policy', policy, headers=HEADERS)
+    expect(rsp.status_code).to(equal(200))
+
+
+if __name__ == "__main__":
+    main()

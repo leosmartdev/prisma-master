@@ -1,0 +1,13 @@
+put t0.xml
+put t1.xml
+put t2.xml
+put t3.xml
+put t4.xml
+put t5.xml
+ren t0.xml t0.txt
+ren t1.xml t1.txt
+ren t2.xml t2.txt
+ren t3.xml t3.txt
+ren t4.xml t4.txt
+ren t5.xml t5.txt
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+logger Recycling demo instance
+systemctl stop tms.service
+rm -rf /var/trident/db/*
+systemctl start tms.service
+logger Recycle complete

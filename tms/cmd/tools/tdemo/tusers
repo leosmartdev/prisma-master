@@ -1,0 +1,455 @@
+#!/usr/bin/python3
+import argparse
+import csv
+import json
+import random
+import uuid
+
+import requests
+from google.protobuf.json_format import MessageToJson, Parse
+
+from prisma.tms.moc import fleet_pb2
+from prisma.tms.moc import site_pb2
+
+DEMO_ADMINISTRATOR = "a0"
+DEMO_PASSWORD = "demopassword"
+CTYPEJSON = {'Content-Type': 'application/json'}
+HOST = 'demo.mcmurdo.io'
+AUTH = 'https://' + HOST + ':8181/api/v2/auth'
+TMS = 'https://' + HOST + ':8080/api/v2'
+CONFIG = 'http://' + HOST + ':8081/api/v2/config.json'
+count = 10
+device_omnicom_index = None
+
+# Disable request warnings
+requests.packages.urllib3.disable_warnings()
+# Instantiate the parser
+parser = argparse.ArgumentParser(description='Getting and setting the policy')
+parser.add_argument('-u', help='admin')
+parser.add_argument('-p', help='admin')
+parser.add_argument('-count', action='store_const', const=10, help='number of users per role')
+
+
+class Session(requests.Session):
+    def request(self, method, url, **kwargs):
+        return super().request(method, url, verify=False, **kwargs)
+
+
+def main():
+    global device_omnicom_index
+
+    device_omnicom_index = device_omnicom_counter()
+
+    args = parser.parse_args()
+    session = create_session(args.u, args.p)
+    create_demo_admin(session)
+    print('admin:created')
+    session = create_session(DEMO_ADMINISTRATOR, DEMO_PASSWORD)
+    # configuration
+    update_configuration(session)
+    print('configuration:updated')
+    # sites
+    create_sites(session)
+    print('sites:created')
+    # users
+    create_users(session)
+    print('users:created')
+    # fleet management
+    persons = create_persons(5000)
+    session = create_session("fm0", DEMO_PASSWORD)
+    vessels = get_vessels(session)
+    if len(vessels) < 1000:
+        vessels = create_vessels(session, persons)
+        print('vessels:' + str(len(vessels)))
+    fleets = create_fleets(session, 32)
+    print('fleets:' + str(len(fleets)))
+    add_vessels_to_fleets(session, vessels, fleets)
+    print('fleet-vessel:created')
+
+
+def ordinal(n):
+    return "%d%s" % (n, "tsnrhtdd"[(n / 10 % 10 != 1) * (n % 10 < 4) * n % 10::4])
+
+
+def add_vessels_to_fleets(session, vessels, fleets):
+    i = 1
+    for fleet in fleets:
+        j = 0
+        while j < i * 2:
+            j += 1
+            vessel = vessels.pop()
+            session.request('PUT', TMS + '/fleet/' + fleet.id + '/vessel/' + vessel.id, headers=CTYPEJSON)
+        i += 1
+
+
+def get_vessels(session):
+    response = session.request('GET', TMS + '/vessel', headers=CTYPEJSON)
+    vessels = []
+    json_vessels = response.json()
+    if len(json_vessels) > 0:
+        for json_vessel in json_vessels:
+            vessels.append(Parse(json.dumps(json_vessel), fleet_pb2.Vessel()))
+    return vessels
+
+
+def create_vessels(session, persons):
+    vessels = []
+    # https://github.com/warrantgroup/IMO-Vessel-Codes/tree/master/data
+    with open('imo-vessel-codes.csv', newline='') as f:
+        reader = csv.reader(f)
+        n = 0
+        for row in reader:
+            if n == 0:
+                n += 1
+                continue
+            vessel = fleet_pb2.Vessel()
+            vessel.name = row[2]
+            vessel.type = row[4]
+            vessel.person.CopyFrom(persons[n])
+            n += 1
+            crew = vessel.crew.add()
+            crew.CopyFrom(persons[n])
+            n += 1
+            device = vessel.devices.add()
+            device.type = 'ais'
+            device.deviceId = str(device_omnicom_index())
+            network = device.networks.add()
+            network.type = 'radio-ais'
+            network.subscriberId = row[1]
+            create_device_omnicom_vms(vessel.devices.add())
+            vessels.append(create_vessel(session, vessel))
+    return vessels
+
+
+def create_vessel(session, vessel):
+    response = session.request('POST', TMS + '/vessel', data=MessageToJson(vessel), headers=CTYPEJSON)
+    if 201 != response.status_code:
+        print(vessel, response.text)
+        exit(1)
+    return Parse(response.text, fleet_pb2.Vessel())
+
+
+def create_device_omnicom_vms(device):
+    device.type = 'omnicom-vms'
+    device.deviceId = str(device_omnicom_index())
+    network = device.networks.add()
+    network.type = 'satellite-data'
+    network.subscriberId = uuid.uuid4().hex
+    network.providerId = 'iridium'
+    network = device.networks.add()
+    network.type = 'cellular-data'
+    network.subscriberId = uuid.uuid4().hex
+    network.providerId = 'Verizon'
+    return device
+
+
+def create_device_cellular_voice(device):
+    device.type = 'phone'
+    network = device.networks.add()
+    network.type = 'cellular-voice'
+    network.subscriberId = phone_number()
+    return device
+
+
+def create_device_international_voice(device):
+    device.type = 'phone'
+    network = device.networks.add()
+    network.type = 'landline-voice'
+    network.subscriberId = phone_international_number()
+    return device
+
+
+def phone_international_number():
+    n = '0000000000'
+    while '9' in n[3:6] or n[3:6] == '000' or n[6] == n[7] == n[8] == n[9]:
+        n = str(random.randint(10 ** 9, 10 ** 10 - 1))
+    return '56' + '-' + n[1:3] + '-' + n[3:6] + '-' + n[6:]
+
+
+def phone_number():
+    n = '0000000000'
+    while '9' in n[3:6] or n[3:6] == '000' or n[6] == n[7] == n[8] == n[9]:
+        n = str(random.randint(10 ** 9, 10 ** 10 - 1))
+    return n[:3] + '-' + n[3:6] + '-' + n[6:]
+
+
+def get_emails():
+    # load names
+    emails = []
+    with open('emails.csv', newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            emails.append(row[0])
+    return emails
+
+
+def create_persons(person_count):
+    persons = []
+    names_first, names_last = get_names()
+    emails = get_emails()
+    for n in range(0, person_count):
+        person = fleet_pb2.Person()
+        person.name = names_first.pop() + ' ' + names_last.pop()
+        create_device_cellular_voice(person.devices.add())
+        device = person.devices.add()
+        device.type = 'email'
+        network = device.networks.add()
+        network.type = 'smtp'
+        network.subscriberId = emails.pop()
+        persons.append(person)
+    return persons
+
+
+def create_fleets(session, fleet_count):
+    fleets = []
+    for n in range(1, fleet_count + 1):
+        fleet = fleet_pb2.Fleet()
+        fleet.name = ordinal(n) + ' Fleet'
+        fleets.append(create_fleet(session, fleet))
+    return fleets
+
+
+def create_fleet(session, fleet):
+    response = session.request('POST', TMS + '/fleet', data=MessageToJson(fleet), headers=CTYPEJSON)
+    if 201 != response.status_code:
+        print(fleet, response.text)
+        exit(1)
+    return Parse(response.text, fleet_pb2.Fleet())
+
+
+def create_demo_admin(session):
+    # create demoAdmin
+    session.request('POST', AUTH + '/user', json={
+        'userId': DEMO_ADMINISTRATOR,
+        'password': DEMO_PASSWORD,
+        'roles': ['Administrator', 'StandardUser'],
+        'profile': {
+            'firstName': "Demo",
+            'lastName': "Omed"
+        }
+    }, headers=CTYPEJSON)
+    return session
+
+
+def create_users(session):
+    names_first, names_last = get_names()
+
+    # StandardUser
+    user_index = 0
+    while user_index < count:
+        session.request('POST', AUTH + '/user', json={
+            'userId': 'su' + str(user_index),
+            'password': DEMO_PASSWORD,
+            'roles': ['StandardUser'],
+            'profile': {
+                'firstName': names_first.pop(),
+                'lastName': names_last.pop()
+            }
+        }, headers=CTYPEJSON)
+        user_index += 1
+
+    # IncidentManager
+    user_index = 0
+    while user_index < count:
+        session.request('POST', AUTH + '/user', json={
+            'userId': 'im' + str(user_index),
+            'password': DEMO_PASSWORD,
+            'roles': ['StandardUser', 'IncidentManager'],
+            'profile': {
+                'firstName': names_first.pop(),
+                'lastName': names_last.pop()
+            }
+        }, headers=CTYPEJSON)
+        user_index += 1
+
+    # FleetManager
+    user_index = 0
+    while user_index < count:
+        session.request('POST', AUTH + '/user', json={
+            'userId': 'fm' + str(user_index),
+            'password': DEMO_PASSWORD,
+            'roles': ['StandardUser', 'FleetManager'],
+            'profile': {
+                'firstName': names_first.pop(),
+                'lastName': names_last.pop()
+            }
+        }, headers=CTYPEJSON)
+        user_index += 1
+
+    # UserManager
+    user_index = 0
+    while user_index < count:
+        session.request('POST', AUTH + '/user', json={
+            'userId': 'um' + str(user_index),
+            'password': DEMO_PASSWORD,
+            'roles': ['StandardUser', 'UserManager'],
+            'profile': {
+                'firstName': names_first.pop(),
+                'lastName': names_last.pop()
+            }
+        }, headers=CTYPEJSON)
+        user_index += 1
+
+
+def get_names():
+    # load names
+    names_first = []
+    with open('names.csv', newline='') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            names_first.append(row[0])
+    names_last = names_first.copy()
+    names_last.reverse()
+    return names_first, names_last
+
+
+def create_session(name, password):
+    session = Session()
+    response = session.post(AUTH + '/session', json.dumps({
+        'userName': name,
+        'token': password,
+    }), headers=CTYPEJSON)
+    if 200 != response.status_code:
+        print(name, response.text)
+    return session
+
+
+def device_omnicom_counter():
+    def inc():
+        inc.counter += 1
+        return inc.counter
+
+    inc.counter = 0
+    return inc
+
+
+def update_configuration(session):
+    response = session.request('GET', CONFIG)
+    if 200 != response.status_code:
+        print(CONFIG, response.text)
+    configuration = response.json()
+    configuration['brand']['name'] = 'PRISMA RCC'
+    # Iquique
+    site = configuration['site']
+    site['siteId'] = 1
+    site['connectionStatus'] = site_pb2.Site.Unknown
+    site['incidentIdPrefix'] = 'IQ-I-'
+    site['type'] = 'MRCC'
+    site['name'] = 'Iquique'
+    site['description'] = 'ANM 23/10'
+    site['country'] = 'CHL'
+    site['point.latitude'] = -20.26000023
+    site['point.longitude'] = -69.91333008
+    site['capability.inputIncident'] = True
+    site['capability.outputIncident'] = True
+    configuration['site'] = site
+    response = session.request('PUT', TMS + '/config', json=configuration, headers=CTYPEJSON)
+    if 200 != response.status_code:
+        print(response)
+
+
+# https://sarcontacts.info/countries/chile/
+def create_sites(session):
+    emails = get_emails()
+    site = site_pb2.Site()
+    site.siteId = 100
+    site.connectionStatus = site_pb2.Site.Unknown
+    site.type = 'MRCC'
+    site.name = 'Chile'
+    site.description = 'General Directorate for Maritime Terrritory and Merchant Marine (DIRECTEMAR)'
+    site.country = 'CHL'
+    site.point.latitude = -33.02333069
+    site.point.longitude = -71.64499664
+    site.capability.inputIncident = False
+    site.capability.outputIncident = False
+    create_device_international_voice(site.devices.add())
+    create_device_international_fax(site.devices.add())
+    create_device_email(site.devices.add(), emails)
+    response = session.request('POST', TMS + '/site', data=MessageToJson(site), headers=CTYPEJSON)
+    parent = response.json()
+    # Iquique
+    site = site_pb2.Site()
+    site.siteId = 1
+    site.connectionStatus = site_pb2.Site.Unknown
+    site.type = 'MRCC'
+    site.name = 'Iquique'
+    site.description = 'ANM 23/10'
+    site.country = 'CHL'
+    site.point.latitude = -20.26000023
+    site.point.longitude = -69.91333008
+    site.capability.inputIncident = True
+    site.capability.outputIncident = True
+    site.parentId = parent['id']
+    create_device_international_voice(site.devices.add())
+    create_device_international_fax(site.devices.add())
+    create_device_email(site.devices.add(), emails)
+    session.request('POST', TMS + '/site', data=MessageToJson(site), headers=CTYPEJSON)
+    # Puerto Montt
+    site = site_pb2.Site()
+    site.siteId = 2
+    site.connectionStatus = site_pb2.Site.Unknown
+    site.type = 'MRCC'
+    site.name = 'Puerto Montt'
+    site.description = 'Updated ANM 23/10'
+    site.country = 'CHL'
+    site.point.latitude = -41.46667099
+    site.point.longitude = -72.94999695
+    site.capability.inputIncident = True
+    site.capability.outputIncident = True
+    site.parentId = parent['id']
+    create_device_international_voice(site.devices.add())
+    create_device_international_fax(site.devices.add())
+    create_device_email(site.devices.add(), emails)
+    session.request('POST', TMS + '/site', data=MessageToJson(site), headers=CTYPEJSON)
+    # Punta Arenas (Cobrem Par)
+    site = site_pb2.Site()
+    site.siteId = 3
+    site.connectionStatus = site_pb2.Site.Unknown
+    site.type = 'MRCC'
+    site.name = 'Punta Arenas (Cobrem Par)'
+    site.description = 'ANM 23/10'
+    site.country = 'CHL'
+    site.point.latitude = -53.15000153
+    site.point.longitude = -70.80000305
+    site.capability.inputIncident = True
+    site.capability.outputIncident = True
+    site.parentId = parent['id']
+    create_device_international_voice(site.devices.add())
+    create_device_international_fax(site.devices.add())
+    create_device_email(site.devices.add(), emails)
+    session.request('POST', TMS + '/site', data=MessageToJson(site), headers=CTYPEJSON)
+    # Valparaiso
+    site = site_pb2.Site()
+    site.siteId = 5
+    site.connectionStatus = site_pb2.Site.Unknown
+    site.type = 'MRCC'
+    site.name = 'Valparaiso'
+    site.description = 'ANM 23/10'
+    site.country = 'CHL'
+    site.point.latitude = -33.0483284
+    site.point.longitude = -71.60166931
+    site.capability.inputIncident = True
+    site.capability.outputIncident = True
+    site.parentId = parent['id']
+    create_device_international_voice(site.devices.add())
+    create_device_international_fax(site.devices.add())
+    create_device_email(site.devices.add(), emails)
+    session.request('POST', TMS + '/site', data=MessageToJson(site), headers=CTYPEJSON)
+
+
+def create_device_email(device, emails):
+    device.type = 'email'
+    network = device.networks.add()
+    network.type = 'smtp'
+    network.subscriberId = emails.pop()
+
+
+def create_device_international_fax(device):
+    device.type = 'fax'
+    network = device.networks.add()
+    network.type = 'landline-data'
+    network.subscriberId = phone_international_number()
+
+
+if __name__ == "__main__":
+    main()

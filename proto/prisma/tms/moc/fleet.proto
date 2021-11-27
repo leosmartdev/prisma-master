@@ -1,0 +1,159 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+
+import "prisma/tms/moc/entityrelationship.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+//FIXME: need to import "prisma/tms/devices/devices.proto" for DeviceType
+
+// FleetShortInfo provides common information about fleet
+message FleetCommonInfo {
+    string id = 1;
+    string name = 2;
+}
+
+message Fleet {
+    string id = 1;
+    string type = 2;
+    string name = 3;
+    Person person = 4; // oneof owner
+    Organization organization = 5; // oneof owner
+    string description = 6;
+    repeated Vessel vessels = 10;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        ADD_VESSEL = 4;
+        REMOVE_VESSEL = 5;
+    }
+}
+
+message Vessel {
+    string id = 1;
+    string type = 2;
+    string name = 3;
+    Person person = 4; // oneof owner
+    Organization organization = 5; // oneof owner
+    repeated Device devices = 6;
+    repeated Person crew = 7; // TODO relationship
+    FleetCommonInfo fleet = 10; // minimal populated id/name
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        ADD_DEVICE = 4;
+        REMOVE_DEVICE = 5;
+    }
+}
+
+message VesselInfo {
+    string id = 1;
+    string type = 2;
+}
+
+message Device {
+    string id = 1;
+    string type = 2; //FIXME: This should be a DeviceType not a string  DeviceType.name
+    string deviceId = 3;
+    string registryId = 4;
+    VesselInfo vesselInfo = 5; // is used to determine is this device assigned to a vessel and which the vessel
+    repeated Network networks = 8;
+    DeviceConfiguration configuration = 9;
+    message Network {
+        string subscriberId = 1;
+        string type = 2; // TODO review metadata, move to metadata or remove, public vs private devices
+        string providerId = 3;
+        //This is the registry id  of the track or activity associated with this network
+        //This field will be useful in order to recover all tracks & activities coming from the same beacon
+        string registryId = 4;
+    }
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+    }
+}
+
+message DeviceType {
+    string id = 1;
+    string name = 2;
+    string model = 3;
+    string system = 4;
+    string systemVersion = 5;
+    message Capability {
+        bool sensorPosition = 1;
+        bool sensorNavigation = 2;
+        bool sensorTiming = 3;
+        bool signalDistress = 7;
+        bool powerBattery = 4;
+        bool powerSolar = 5;
+        bool powerExternal = 6;
+        bool networkSatellite = 9;
+        bool networkCellular = 10;
+        bool networkInternet = 11;
+        bool networkRadio = 12;
+        bool inputText = 13;
+        bool inputGeofence = 14;
+        bool inputRoute = 15;
+        bool inputFirmware = 16;
+        bool inputRule = 17;
+        bool outputAudio = 18;
+        bool outputLight = 19;
+        bool outputText = 20;
+        bool outputGraphic = 21;
+    }
+    google.protobuf.Any specification = 6;
+}
+
+
+message Organization {
+    string id = 1;
+    string name = 2;
+    string address = 3;
+    repeated Device devices = 10;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        ADD_DEVICE = 4;
+        REMOVE_DEVICE = 5;
+    }
+}
+
+message Person {
+    string id = 1;
+    string userId = 2; //optional
+    string name = 3;
+    string address = 4;
+    repeated Device devices = 10;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        ADD_DEVICE = 4;
+        REMOVE_DEVICE = 5;
+    }
+}
+
+message Message {
+    string id = 1;
+    string body = 2;
+    repeated string fileId = 4;
+}
+
+message DeviceConfiguration {
+    string id = 1; // Device.id
+    repeated EntityRelationship entities = 2;
+    string fileId = 3;
+    google.protobuf.Any configuration = 4;
+    google.protobuf.Timestamp lastUpdate = 5;
+    google.protobuf.Any original = 6;
+}

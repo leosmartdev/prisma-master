@@ -1,0 +1,4 @@
+# Customized login using htpasswd file
+auth    required pam_pwdfile.so pwdfile /etc/trident/vsftpd.passwd
+account required pam_permit.so
+

@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package prisma.tms.marker;
+
+import "google/protobuf/timestamp.proto";
+
+message Marker {
+    string id = 1;
+    string type = 2;
+    string shape = 3;
+    Point position = 4;
+    Color color = 5;
+    string description = 6;
+    FileMetadata image_metadata = 7;
+    google.protobuf.Timestamp timestamp = 8;
+    bool deleted = 9;
+
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+    }
+}
+
+message MarkerImage {
+    string id = 1;
+    FileMetadata metadata = 7;
+    google.protobuf.Timestamp timestamp = 8;
+
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+    }
+}
+
+message Point {
+    double latitude = 1;
+    double longitude = 2;
+    double altitude = 3;
+}
+
+message Color {
+    int32 r = 1;
+    int32 g = 2;
+    int32 b = 3;
+    float a = 4;
+}
+
+message FileMetadata {
+    string id = 1;
+    string name = 2;
+    string type = 3;
+    int64 size = 4;
+    string md5 = 5;
+}

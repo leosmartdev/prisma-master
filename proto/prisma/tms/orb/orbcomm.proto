@@ -1,0 +1,90 @@
+syntax = "proto2";
+
+//import "MessageCommon.proto";
+
+package prisma.tms.orb;
+
+
+// $PMWLSS,CurrentTime,Status,Username,Password,Direction
+message Pmwlss{
+    optional uint64 current_time = 1;
+    optional uint32 status = 2;
+    optional string username = 3;
+    optional string password = 4;
+    optional uint32 direction = 5;
+}
+
+// $PMWTS2,Source,LCSeqNo,LCStart,LCEnd,Reason,LCNoMsg,Direction
+message Pmwts2 {
+    optional uint32 source = 1;
+    optional uint32 lc_seq_number = 2;
+    optional uint64 lc_start_time = 3;
+    optional uint64 lc_end_time = 4;
+    optional uint32 closure_reason = 5;
+    optional uint32 lc_number_messages = 6;
+    optional uint32 direction = 7;
+}
+
+// $PMWTS1,CurrentTime,Source,Version,CCSeqNo,CCNoMsg,CCStart,Direction
+message Pmwts1 {
+    optional uint64 current_time = 1;
+    optional uint32 source = 2;
+    optional string version = 3;
+    optional uint32 cc_seq_number = 4;
+    optional uint32 cc_number_messages = 5;
+    optional uint64 cc_start_time = 6;
+    optional uint32 direction = 7;
+}
+
+// There are 3 options I know of:
+// \{COMMENT}\{AIVDM}
+// \{COMMENT}\{PORB}<CR><LF>\{COMMENT}\{AIVDM}
+// \{COMMENT}\{AIVDM}<CR><LF>\{COMMENT}\{AIVDM}
+message Orbacomm {
+    required Line1 line1 = 1;
+    optional Line2 line2 = 2;
+}
+
+message Line1 {
+    optional Comment comment = 1;
+    // must contain exactly one of {PORB,AIVDM}
+    optional Porb porb = 2;
+    optional Aivdm aivdm = 3;
+}
+
+message Line2 {
+    optional Comment comment = 1;
+    required Aivdm aivdm = 2;
+}
+
+message Comment {
+    optional string g = 1;
+    optional string c = 2;
+    optional string s = 3;
+    optional string q = 4;
+    optional string T = 5;
+    optional string i = 6;
+}
+
+// $PORB,MsgNum,Dopt,Dodf,Lat,Lon,Alt,CalcEpt,CalcEdf
+message Porb {
+    optional uint32 message_number = 1;
+    optional double dopt = 2;
+    optional double dodf = 3;
+    optional double latitude = 4;
+    optional double longitude = 5;
+    optional double altitude = 6;
+    optional double calculated_expected_propagation_time = 7;
+    optional double calculated_expected_doppler_frequency = 8;
+}
+
+// !AIVDM,TotalSentences,SentenceNumber,SeqMsgNumber,AISChannel,Msg,FillBitsNumber
+message Aivdm {
+    optional uint32 total_sentences = 1;
+    optional uint32 sentence_number = 2;
+    optional uint32 sequential_message_number = 3;
+    optional string ais_channel = 4;
+    optional string encapsulated_data = 5;
+    optional uint32 fill_bits = 6;
+    required string entire_aivdm_message = 7;
+}

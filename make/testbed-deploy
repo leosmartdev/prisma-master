@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname $0)
+TESTBED=/srv/prisma/testbed
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+mkdir -p $TESTBED/$BRANCH 
+rm -f $TESTBED/$BRANCH/*
+
+cp $BASEDIR/../dist/* $TESTBED/$BRANCH
+( cd $TESTBED/$BRANCH ; dpkg-scanpackages . /dev/null | gzip -c9 > Packages.gz )
+

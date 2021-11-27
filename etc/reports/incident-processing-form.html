@@ -1,0 +1,180 @@
+<style type="text/css">
+    /* font color fix */
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important;
+        font-family: arial, sans-serif;
+        font-size: 8pt;
+    }
+    input {
+        border-bottom: 1px solid black;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        background-color: green;
+        color: black;
+    }
+    textarea {
+        border: none;
+    }
+    td {
+        padding: 5px;
+    }
+    h1 {
+        text-align: center;
+        font-size: 12pt;
+		padding-top: 7%;
+    }
+    .emergency-phase {
+        display: inline-block;
+        width: 50%;
+		padding-top: 1%;
+		padding-right: 4%;
+    }
+	.table-header td {
+        width: 33%;
+	}
+    .table-header {
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+	.table-body {
+        margin-left: 10%;
+		margin-right: 10%;
+	}
+	.emergency-phase-container {
+		margin-left: 10%;
+	}
+</style>
+<h1>Incident {{.IncidentId}}</h1>
+<table class="table-header">
+    <tr>
+        <td>
+            Initial Reporting Particulars: <input value={{.InitialReportingParticulars}}>
+            <br>
+            Name: <input value={{.Name1}}>
+        </td>
+        <td>
+            Phone: <input value={{.Phone1}}>
+        </td>
+        <td>
+            Call sign: <input value={{.CallSign1}}>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            Nature of Emergency: {{.Type}}
+            <br>
+            Assistance Desired: <input value={{.AssistanceDesired}}>
+        </td>
+    </tr>
+</table>
+<table border="1" class="table-body">
+    <tr>
+        <td width="33%">Search Object Particulars</td>
+        <td width="33%">Location/Route</td>
+        <td width="33%">Victim/Survival Data</td>
+    </tr>
+    <tr>
+        <td valign="top">
+            NAME: <textarea>{{.Name2}}</textarea>
+            <hr>
+            CALL SIGN: <textarea>{{.CallSign2}}</textarea>
+            <hr>
+            DESCRIPTION:
+            <br>
+            Size: <input value={{.Size}}>
+            <br>
+            Type: <input value={{.SoType}}>
+            <br>
+            Hull/Tail No.: <input value={{.Hull}}>
+            <br>
+            Colour: <input value={{.Colour1}}>
+            <br>
+            hull/fuselage <input value={{.Fuselage}}>
+            <br>
+            Colour: <input value={{.Colour2}}>
+            <br>
+            cabin/deck/wingtip <input value={{.Wingtip}}>
+            <br>
+            Rigging: <input value={{.Rigging}}>
+            <hr>
+            <br>
+            FUEL ON BOARD: <textarea>{{.FuelOnBoard}}</textarea>
+            <hr>
+            <br>
+            NAV EQUIPMENT: <textarea>{{.NavEquipment}}</textarea>
+        </td>
+        <td valign="top">
+            CURRENT POSITION: <input value={{.CurrentPosition}}>
+            <br>
+            How determined: <input value={{.HowDetermined}}>
+            <br>
+            Time: <input value={{.Time1}}>
+            <br>
+            DEPARTED FROM: <input value={{.DepartedFrom}}>
+            <br>
+            Time: <input value={{.Time2}}>
+            <br>
+            EN ROUTE TO: <input value={{.EnRouteTo}}>
+            <br>
+            ETA: <input value={{.ETA}}>
+            <br>
+            ROUTE DESCRIPTION (SOA, course):
+            <textarea>{{.RouteDescription}}</textarea>
+
+            POSSIBLE ROUTE DEVIATIONS:
+            <textarea>{{.PossibleRouteDeviations}}</textarea>
+            <br>
+            CRAFT HISTORY: <textarea>{{.CraftHistory}}</textarea>
+        </td>
+        <td valign="top">
+            NUMBER PERS ON BOARD: <input value={{.NumberPersOnBoard}}>
+            <br>
+            EPIRB: <input value={{.EPIRB}}>
+            <br>
+            RADIO FREQUENCIES: <input value={{.RadioFrequencies}}>
+            <hr>
+            SURVIVAL EQUIPMENT: <input value={{.SurvivalEquipment}}>
+            <br>
+            FOOD/WATER DURATION: <input value={{.FoodWaterDuration}}>
+            <hr>
+            OWNER NAME: <input value={{.OwnerName}}>
+            <br>
+            PHONE: <input value={{.Phone2}}>
+            <br>
+            ADDRESS: <textarea>{{.Address}}</textarea>
+            <br>
+            FRIENDS/NOK/AGENTS:
+            <br>
+            NAME:  <input value={{.Name3}}>
+            <br>
+            PHONE: <input value={{.Phone3}}>
+            <br>
+            ADDRESS: <input value={{.Address3}}>
+            <p>Attach separate POB list w/NOK information.<p>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            CURRENT WEATHER ALONG PROPOSED ROUTE (SEE ALSO WEATHER FROM):
+            <input value={{.WeatherAlongRoute}}>
+            <hr>
+            (TIME, WIND DIRECTION/SPEED, TEMP, PRECIP, BAROMETER, CLOUD COVER, SEA STATE, TERRAIN)
+            <br>
+            CURRENT WEATHER AT PRESENT LOCATION: <input value={{.WeatherAtPresentLocation}}>
+            <hr>
+            (TIME, WIND DIRECTION/SPEED, TEMP, PRECIP, BAROMETER, CLOUD COVER, SEA STATE, TERRAIN)
+            <br>
+            FORECAST ALONG PROPOSED ROUTE: <input value={{.ForecastAlongProposedRoute}}>
+            <hr>
+            (TIME, WIND DIRECTION/SPEED, TEMP, PRECIP, BAROMETER, CLOUD COVER, SEA STATE, TERRAIN)
+        </td>
+    </tr>
+</table>
+
+<div class="emergency-phase-container">
+    <div class="emergency-phase">EMERGENCY PHASE: {{.Phase}}</div>
+</div>

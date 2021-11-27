@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package prisma.tms.client_api;
+
+import "prisma/tms/feature.proto";
+import "prisma/tms/common.proto";
+
+// Infomation about a view
+message View {
+    // a View's ID. Will be needed for other requests
+    string id = 1;
+
+    // The original request
+    ViewRequest request = 5;
+}
+
+message ViewRequest {
+    // Request an identifier. May be mutated on the server to make it unique
+    string id = 1;
+
+    // The coordinate system into which the view should be projected
+    ProjectionType projection = 10;
+
+    // What feature types does the client want to see?
+    repeated FeatureType types = 12;
+
+    // Switch over to heatmap mode when at least these many features are 
+    // in the view
+    uint32 start_heatmap_count = 13;
+
+    // Switch back to normal updates when less than these features are 
+    // in the view
+    uint32 stop_heatmap_count = 14;
+}
+
+enum ProjectionType {
+    UnknownProjection = 0;
+    WebMercator = 1;
+}
+
+message StreamRequest {
+    // The ID of the view to view
+    string view_id = 1;
+
+    // Additional (thin) filters
+    prisma.tms.BBox bounds = 10;
+    HistoryRequest history = 11;
+}
+
+message DetailRequest {
+    // The view from which this detail is begin requested
+    string view_id = 1;
+
+    // The feature about which details are being requested
+    string feature_id = 2;
+    uint64 history = 4;
+    string type = 5;
+}
+
+message HistoryRequest {
+    string track_id = 2;
+    string registry_id = 3;
+    // Amount of history to return, in seconds. 
+    uint64 history = 4;
+    bool clear_all = 5;
+}
+
+message FeatureDetail {
+    string view_id = 1;
+    string feature_id = 2;
+
+    // The current feature with lots of properties filled in
+    prisma.tms.Feature details = 5;
+
+    // If requested, history of feature details
+    repeated prisma.tms.Feature history = 6;
+}
+
+message FeatureSearchRequest {
+    string view_id = 1;
+    string search = 2;
+}

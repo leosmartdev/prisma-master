@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package prisma.tms.security.message;
+
+message Permission {
+    string classId = 1;
+    repeated string actions =  2;
+}

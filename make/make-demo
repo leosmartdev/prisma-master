@@ -1,0 +1,8 @@
+#!/bin/bash
+
+BASEDIR=$(dirname $0)/..
+
+cd ${BASEDIR}/tms/cmd/tools/tdemo
+
+pip3 install -r requirements.txt
+./tusers -u admin -p admin

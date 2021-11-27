@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package prisma.tms.devices;
+
+enum DeviceType {
+    Unknown = 0;
+    Radar = 1;
+    AIS = 2;
+    Camera = 3;
+    GPS = 4;
+    Fusion = 6;
+    Blueforce = 7;
+    TV32 = 8;
+    Sonar = 9;
+    Orb = 11;
+    OmnicomSolar = 15;
+    SART = 16;
+    SARSAT = 17;
+    Manual = 18;
+    OmnicomVMS = 19;
+    Spidertracks = 20;
+    ADSB = 21;
+    VTSAIS = 22;
+    VTSRadar = 23;
+
+    // This is not device
+    // Define here only to use this as Target.Type
+    Marker = 99;
+
+    AllDevices = 100;
+}

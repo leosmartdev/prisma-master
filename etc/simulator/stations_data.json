@@ -1,0 +1,37 @@
+[{
+  "device": "ais",
+  "latitude": 1.171931,
+  "longitude": 103.131706,
+  "radius": 0.5,
+  "addr": ":9000"
+},{
+  "device": "ais",
+  "latitude": 1.187700,
+  "longitude": 104.02186,
+  "radius": 100,
+  "addr": ":9001"
+} ,{
+  "device": "ais",
+  "latitude": 1.151931,
+  "longitude": 102.903754,
+  "radius": 0.3,
+  "addr": ":9002"
+},{
+  "device": "ais",
+  "latitude": 2.351931,
+  "longitude": 102.803754,
+  "radius": 0.2,
+  "addr": ":9004"
+},{
+  "device": "sart",
+  "latitude": 1,
+  "longitude": 1,
+  "radius": 10.2,
+  "addr": ":9014"
+},{
+  "device": "radar",
+  "latitude": 0,
+  "longitude": 0,
+  "radius":10,
+  "addr": ":9003"
+}]

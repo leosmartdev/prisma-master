@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "google/protobuf/timestamp.proto";
+
+message RemoteSite {
+    string id = 1;
+    string type = 2;
+    string name = 3;
+    string description = 4;
+    string address = 5;
+    string country = 6; // 3 letter ISO country code
+    string cscode = 7;
+    string csname = 8;
+    int32 current_message_num = 9; // 00001 - 99999
+    FtpCommunication ftp_communication = 10;
+    google.protobuf.Timestamp timestamp = 20;
+    bool deleted = 21;
+    repeated CommLinkType comm_link_types = 22;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+    }
+}
+
+message FtpCommunication {
+    string hostname = 1;
+    string ip_address = 2;
+    string username = 3;
+    string password = 4;
+    string starting_directory = 5;
+    bool fallback_to_ftp = 6; //attempt FTP after SFTP failure
+}
+
+message CommLinkType {
+    string name = 1;
+    bool enabled = 2;
+}

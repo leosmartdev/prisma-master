@@ -1,0 +1,81 @@
+{
+  "builders": [
+    {
+      "type": "docker",
+      "image": "amd64/ubuntu:xenial",
+      "export_path": "image.tar",
+      "changes": [
+        "ENV GOPATH /root/go",
+        "ENV PATH \"$PATH:/opt/go/bin:/root/go/bin\"",
+        "WORKDIR /root/go/src"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "apt-get update",
+        "apt-get install -yq vim build-essential python-minimal git curl sudo locales rsyslog xvfb libgtk2.0-0 libxtst6 libxss1 gconf2 libnss3 libasound2 scons libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev cmake zlib1g-dev unzip autoconf automake libtool software-properties-common",
+        "add-apt-repository -y -u ppa:masterminds/glide",
+        "apt-get install glide"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "curl --silent -O -L https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz",
+        "tar xf go*.tar.gz"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "git clone https://github.com/Softmotions/ejdb.git",
+        "cd ejdb",
+        "mkdir build",
+        "cd build",
+        "cmake -DCMAKE_BUILD_TYPE=Release ../",
+        "make install",
+        "ldconfig"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "curl --silent -O -L https://github.com/google/protobuf/archive/v3.6.0.tar.gz",
+        "tar xf v3*.tar.gz",
+        "cd protobuf*",
+        "./autogen.sh",
+        "./configure",
+        "make install",
+        "ldconfig"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /root",
+        "mkdir go",
+        "mkdir go/src"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt/go/bin",
+        "./go get -u github.com/golang/protobuf/protoc-gen-go"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "docker-import",
+      "repository": "orolia/amd64-ubuntu-build",
+      "tag": "latest"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "google/protobuf/timestamp.proto";
+import "prisma/tms/sar/beacon.proto";
+
+message Notice {
+
+    enum Event {
+        no_event = 0;
+        Rule = 1;
+        EnterZone = 2;
+        ExitZone = 3;
+        Sart = 4;
+        Sarsat = 5;
+        OmnicomAssistance = 6;
+        SarsatDefaultHandling = 7;
+        OmnicomTestMode = 8;
+        OmnicomRegister = 9;
+        IncidentTransfer = 10;
+        OmnicomTransmission = 11;
+        OmnicomPositionReport = 12;
+        OmnicomFullBuffer = 13;
+        OmnicomGeoIdDoesNotExist = 14;
+        OmnicomUploadGeoFence = 15;
+        SarsatMessage = 16;
+    }
+
+    enum Priority {
+        Info = 0;
+        Alert = 1;
+        Message = 2;
+    }
+
+    enum Action {
+        no_action = 0;
+        NEW = 1;
+        ACK = 2;
+        ACK_WAIT = 6;
+        ACK_ALL = 7;
+        CLEAR = 3;
+        GET = 4;
+        TIMEOUT = 5;
+    }
+
+    string database_id = 1;
+    string notice_id = 2;
+
+    google.protobuf.Timestamp created_time = 3;
+    google.protobuf.Timestamp ack_time = 4;
+    google.protobuf.Timestamp updated_time = 5;
+    google.protobuf.Timestamp cleared_time = 6;
+
+    Event event = 7;
+    Action action = 8;
+    Priority priority = 13;
+
+    SourceInfo source = 16;
+    TargetInfo target = 17;
+}
+
+message TargetInfo {
+    string track_id = 1;
+    string activity_id = 2;
+    string registry_id = 3;
+    string database_id = 4;
+    string type = 11;
+
+    string name = 5;
+    string mmsi = 6;
+    string imei = 7;
+    prisma.tms.sar.Beacon sarsat_beacon = 10;
+    uint32 radar_target = 8;
+    string ingenu_node_id = 9;
+    string message = 13;
+}
+
+message SourceInfo {
+    string name = 1;
+    string zone_id = 2;
+    string incidentId = 3;
+    string multicastId = 4;
+}

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname "$0")/..
+[ $GOBIN ] || GOBIN=$GOPATH/bin
+DST=$1
+
+mkdir -p $DST/usr/bin
+mkdir -p $DST/usr/sbin
+mkdir -p $DST/usr/share/tms-demo 
+
+cp $GOBIN/omnicom-iridium         $DST/usr/bin/omnicom-iridium
+cp $GOBIN/tsimulator              $DST/usr/bin/tsimulator
+cp $GOBIN/tmccrd                  $DST/usr/bin/tmccrd
+
+cp $BASEDIR/make/demo/*                     $DST/usr/share/tms-demo 
+cp $BASEDIR/tms/cmd/tools/tplayd            $DST/usr/bin/tplayd
+cp $BASEDIR/tms/cmd/tools/tms-recycle/tms-recycle       $DST/usr/sbin/tms-recycle
+
+
+
+

@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<topMessage>
+    <header dest="2770" orig="2570" number="14063" date="2014-10-14T13:46:17Z" />
+    <message>
+        <freeformMessage>
+            <subject>Test Message</subject>
+            <body>This is the body of the test message</body>
+        </freeformMessage>
+    </message>
+</topMessage>

@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+
+//This has to be changed in the future because it does not reflect a valid geojson point
+message GeoJsonCoordinates {
+    double latitude = 2;
+    double longitude = 3;
+}
+
+//Changing coordinates just in GeoJsonGeometryPoint is a hack for sarmap to work
+message GeoJsonGeometryPoint {
+    string type = 1;
+    repeated double coordinates = 2;
+}
+
+message GeoJsonFeaturePoint {
+    string type = 1;
+    map<string, string> properties = 2;
+    GeoJsonGeometryPoint geometry = 3;
+}
+
+message GeoJsonFeatureCollectionPoint {
+    string type = 1;
+    repeated GeoJsonFeaturePoint features = 2;
+}
+
+message GeoJsonGeometryPolygon {
+    string type = 1;
+    repeated GeoJsonCoordinates coordinates = 2;
+}
+
+message GeoJsonFeaturePolygon {
+    string type = 1;
+    map<string, string> properties = 2;
+    GeoJsonGeometryPolygon geometry = 3;
+}
+
+message GeoJsonFeatureCollectionPolygon {
+    string type = 1;
+    repeated GeoJsonFeaturePolygon features = 2;
+}
+
+message GeoJsonMixedCollection {
+    string type = 1;
+    GeoJsonFeatureCollectionPolygon polygons = 2;
+    GeoJsonFeatureCollectionPoint points = 3;
+}

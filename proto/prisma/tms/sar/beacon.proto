@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package prisma.tms.sar;
+
+message Beacon {
+    // Bits 40-83 are used to encode the identification data of the beacon and,
+    // together with the protocol flag, the country code, the protocol code,
+    // and bits 84-85, shall form a unique identification for each beacon,
+    // i.e. the beacon 15 Hex ID. They will be discussed separately for each
+    // user protocol.
+    string hex_id = 1;
+
+    // Bits 27-36 designate a three-digit decimal country code number expressed
+    // in binary notation. Country codes are based on the International
+    // Telecommunication Union (ITU) Maritime Identification Digit (MID)
+    // country code available on the ITU website
+    // (www.itu.int/cgibin/htsh/glad/cga_mids.sh).
+    //
+    // National administrations allocated more than one MID code may opt to use
+    // only one of these codes. However, when the 6 trailing digits of a MMSI
+    // are used to form the unique beacon identification, the country code
+    // shall always correspond to the first 3 digits of the MMSI code.
+    //
+    // For all types of protocols, except the test protocols, the country code
+    // designates the country of beacon registration, where additional
+    // information can be obtained from a database.
+    uint64 country_code = 2;
+
+    oneof protocol {
+        MaritimeUser maritime_user = 3;
+        RadioCallSignUser radio_call_sign_user = 4;
+        AviationUser aviation_user = 5;
+        SerialUser serial_user = 6;
+        NationalUser national_user = 7;
+        MaritimeStandardLocation maritime_standard_location = 8;
+        AviationStandardLocation aviation_standard_location = 9;
+        SerialStandardLocation serial_standard_location = 10;
+        ShipSecurityLocation ship_security_location = 11;
+        NationalLocation national_location = 12;
+        RLSLocation rls_location = 13;
+        NationalUser test_user = 14;
+       OrbitographyProtocol orbitography_protocol = 15; 
+
+    }
+}
+
+// auxiliary_radio_locating_device (bits 84-85)
+// 00: no auxiliary radio-locating device
+// 01: 121.5 MHz
+// 10: maritime 9 GHz Search and Rescue Radar Transponder (SART)
+// 11: other auxiliary radio-locating device(s)
+
+message MaritimeUser {
+    // Bits 40-75 designate the radio call sign or the last 6 digits of the
+    // 9 digit maritime mobile service identity (MMSI) using the
+    // modified-Baudot code. This code enables 6 characters to be encoded
+    // using 36 bits (6x6 = 36). This data will be right justified with a
+    // modified-Baudot space (100100) being used where no character exists. If
+    // all characters are digits, the entry is interpreted as the trailing 6
+    // digits of the MMSI.
+    uint64 mmsi = 1;
+    string call_sign = 2;
+
+    // Bits 76-81 are used to identify specific beacons on the same vessel
+    // (the first or only float free beacon shall be coded with a
+    // modified-Baudot zero (001101); additional beacons shall be numbered
+    // consecutively using modified-Baudot characters 1 to 9 and A to Z).
+    string specific_beacon_number = 3;
+
+    // bits 84-85
+    uint64 auxiliary_radio_locating_device = 4;
+}
+
+message RadioCallSignUser {
+    // Bits 40-75 contain the radio call sign of up to 7 characters. Radio
+    // call signs of fewer than 7 characters should be left justified in the
+    // radio call sign field (bits 40-75) and padded with "space" (1010)
+    // characters in the binary-coded decimal field (bits 64-75).
+    //
+    // bits 40-63, first 4 characters, modified-Baudot
+    // bits 64-75, last 3 characters, binary-coded decimal
+    string call_sign = 1;
+
+    // Bits 76-81 are used to identify specific beacons on the same vessel
+    // (the first or only float free beacon shall be coded with a
+    // modified-Baudot zero (001101); additional beacons shall be numbered
+    // consecutively using modified-Baudot characters 1 to 9 and A to Z).
+    string specific_beacon_number = 2;
+
+    // bits 84-85
+    uint64 auxiliary_radio_locating_device = 4;
+}
+
+message AviationUser {
+    // Bits 40-81 designate the aircraft registration marking which is
+    // encoded using the modified-Baudot code. This code enables 7 characters
+    // to be encoded using 42 bits (6x7=42). This data will be right
+    // justified with a modified-Baudot space (100100) being used where no
+    // character exists.
+    string aircraft_registration_marking = 1;
+
+    // Bits 82-83 are used to create a unique ELT identification when several
+    // ELTs coded with the Aviation User protocol are installed on the same
+    // aircraft. “00” indicates the first ELT on the aircraft coded with this
+    // protocol and “01”, “10” and “11” identify additional ELTs, all coded
+    // with the Aviation User protocol.
+    uint64 specific_elt_number = 2;
+
+    // bits 84-85
+    uint64 auxiliary_radio_locating_device = 4;
+}
+
+message SerialUser {
+    // Bits 40-42 indicate the beacon type with serial identification data
+    // encoded, as follows:
+    //     000: indicates an aviation ELT serial number is encoded in
+    //          bits 44-63
+    //     010: indicates a maritime float free EPIRB serial number is encoded
+    //          in bits 44-63
+    //     100: indicates a maritime non float free EPIRB serial number is
+    //          encoded in bits 44-63
+    //     110: indicates a personal locator beacon (PLB) serial number is
+    //          encoded in bits 44-63
+    //     011: indicates the aircraft 24-bit address is encoded in bits 44-67
+    //          and specific ELT number in bits 68-73 if several ELTs, encoded
+    //          with the same 24 bit address, are carried in the same aircraft
+    //     001: indicates an aircraft operator designator and a serial number
+    //          are encoded in bits 44-61 and 62-73, respectively.
+    uint64 beacon_type = 1;
+
+    // Bits 44-63 designate a serial identification code number ranging from
+    // 0 to 1,048,575 (i.e., 2^20-1) expressed in binary notation, with the
+    // least significant bit on the right.
+    //
+    // For Aircraft Operator Desiginator, Bits 62 to 73 are a serial number
+    // (in the range of 1 up to 4095) as designated by the aircraft operator,
+    // encoded in binary notation, with the least significant bit on the right.
+    uint64 serial_number = 2;
+
+    // Bits 44-67 are a 24-bit binary number assigned to the aircraft.
+    uint64 aircraft_address = 3;
+
+    // Bits 68-73 contain the 6-bit specific ELT number, in binary notation
+    // with the least significant bit on the right, which is an order number of
+    // the ELT in the aircraft or default to “0” when only one ELT is carried;
+    // the purpose of this specific number is to produce different 15 Hex
+    // numbers containing the same 24-bit address.
+    uint64 specific_elt_number = 4;
+
+    // Bits 44-61 are a 3-letter aircraft operator designator from the list
+    // of "Designators for Aircraft Operating Agencies, Aeronautical
+    // Authorities and Services" published by the International Civil
+    // Aviation Organization (ICAO). The 3 letters are encoded using the
+    // modified-Baudot code of Table
+    string aircraft_operator_designator = 5;
+
+    // Bit 43 is a flag bit to indicate that the Cospas-Sarsat type approval
+    // certificate number is encoded.
+    //
+    // If bit 43 is set to 1:
+    //
+    // - bits 64-73 should either be set to all 0s or allocated for national
+    // use and control (and will be made public when assigned by the
+    // responsible administration) or used as defined for coding the aircraft
+    // 24-bit address or aircraft operator designator;
+    //
+    // - bits 74-83 should be encoded with the Cospas-Sarsat type approval
+    // certificate number which is assigned by the Cospas-Sarsat Secretariat
+    // for each beacon model approved according to the type approval procedure
+    // of document C/S T.007. The certificate number is to be encoded in binary
+    // notation with the least significant bit on the right.
+    //
+    // If bit 43 is set to 0:
+    //
+    // - bits 64-83 are for national use and control (and will be made public
+    // when assigned by the responsible administration) or used as defined for
+    // coding the aircraft 24-bit address or aircraft operator designator.
+    uint64 certificate_number = 6;
+    uint64 national_use = 7;
+
+    // bits 84-85
+    uint64 auxiliary_radio_locating_device = 8;
+}
+
+message NationalUser {
+    // bits: 40-85 national use
+    uint64 national_use = 1;
+
+    // bits 107-112: national use
+    // bits 113-132: national use (if long message)
+    uint64 national_use_2 = 2;
+}
+
+message OrbitographyProtocol {
+    //bits: 40-85 Orbitography Protocol
+    uint64 orbitography_protocol = 1;
+}
+
+// (PC=0010) the last six digits of MMSI in binary form in bits 41 to 60
+// (20 bits), plus a 4-bit specific beacon number (0 to 15) in bits
+// 61 to 64, to distinguish between several EPIRBs on the same ship.
+message MaritimeStandardLocation {
+    uint64 mmsi = 1;
+    uint64 specific_beacon_number = 2;
+}
+
+// (PC=0011) a 24-bit aircraft address (only one ELT per aircraft can be
+// identified using this protocol)
+message AviationStandardLocation {
+    uint64 aircraft_address = 1;
+}
+
+// (PC=01xx) a 24-bit unique serial identification including:
+message SerialStandardLocation {
+    // Protocol code
+    // 0100: ELT-serial
+    // 0101: ELT-aircraft operator designator
+    // 0110: EPRIB-serial
+    // 0111: PLB-serial
+    uint64 beacon_type = 1;
+
+    // (i) the 10-bit Cospas-Sarsat type approval certificate number of the
+    // beacon (1 to 1,023) in bits 41 to 50, and a 14 bit serial number
+    // (1 to 16,383) in bits 51 to 64; or
+    //
+    // (ii) a 15-bit aircraft operator designator in bits 41 to 55, and a 9-bit
+    // serial number (1 to 511) assigned by the operator in bits 56 to 64.
+    uint64 certificate_number = 2;
+    string aircraft_operator_designator = 3;
+    uint64 serial_number = 4;
+}
+
+// (PC=1100) the last six digits of MMSI in binary form in bits 41 to 60
+// (20 bits), plus four spare fixed bits, 61 to 64, set to “0000”.
+message ShipSecurityLocation {
+    uint64 mmsi = 1;
+}
+
+message NationalLocation {
+    // Value of the protocol code, bits 37-40
+    // 1000: ELT
+    // 1010: EPRIB
+    // 1011: PLB
+    uint64 beacon_type = 1;
+
+    // bits 41 to 58: 18-bit identification data consisting of a serial number
+    // assigned by the appropriate national authority,
+    uint64 serial_number = 2;
+}
+
+message RLSLocation {
+    // Beacon Type, bits 41-42
+    // when bits 43-46 are not 1111:
+    //   00 - ELT
+    //   01 - EPIRB
+    //   10 - PLB
+    //   11 - Location Test Protocol
+    // when bits 43-46 are 1111:
+    //   00 - First EPRIB on vessel
+    //   01 - Second EPIRB on vessel
+    //   10 - PLB
+    //   11 - Location Test Protocol
+    uint64 beacon_type = 1;
+
+    // bits 43-46: set to 1111 to indicate hat this is an RLS Location Protocol
+    // encoded with an MMSI, any other comobnation to indicate is coded
+    // with either a TAC or national RLS and serial number
+    bool has_mmsi = 2;
+
+    // bits 43 to 52: 10 bit truncated RLS TAC number of National RLS Number
+    //
+    // The 10-bit RLS truncated TAC or National RLS number is the last 3
+    // decimal numbers in the TAC number data field, which allows a range of
+    // 1 to 949. The RLS beacon TAC number or National RLS number series are
+    // assigned as follows:
+    // 1000 series is reserved for EPIRPs (i.e. 1001 to 1949),
+    // 2000 series is reserved for ELTs (i.e. 2001 to 2949), and
+    // 3000 series is reserved for PLBs (i.e. 3001 to 3949).
+    //
+    // The numbers 920 to 949 (i.e., National RLS Numbers 920 to 949) are set
+    // aside for National Use by Competent Authorities. That is full National
+    // RLS Numbers 1920 to 1949 for EPIRBs, 2920 to 2949 for ELTs, and
+    // 3920 to 3949 for PLBs.
+    uint64 tac_number = 3;
+    uint64 national_rls_number = 4;
+
+    // bits 53 to 66:
+    //
+    // 14-bit identification data consisting of a production serial number
+    // (1 to 16,383) assigned by the manufacturer associated with a
+    // C/S RLS TAC number (001 to 919), except when bits 43 to 46 are
+    // set to “1111”
+    //
+    // or
+    //
+    // 14-bit identification data consisting of a Competent Authority
+    // assigned serial number (1 to 16,383), associated with a National
+    // RLS Number that has been allocated to an Administration by the
+    // Cospas-Sarsat Programme (920 to 949 * ), except when bits 43 to 46
+    // are set to “1111”
+    uint64 serial_number = 5;
+
+    // bits 47 to 66, last six digits of the MMSI in binary form
+    uint64 mmsi_suffix = 6;
+}

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+SERVICE_USER=prisma
+
+timedatectl set-timezone Etc/UTC
+
+if ! $(id $SERVICE_USER >/dev/null 2>&1) ; then
+    useradd $SERVICE_USER
+fi
+
+install -o $SERVICE_USER -g $SERVICE_USER -d /etc/trident
+install -o $SERVICE_USER -g $SERVICE_USER -d /var/trident
+install -o $SERVICE_USER -g $SERVICE_USER -d /var/trident/db
+install -o $SERVICE_USER -g $SERVICE_USER -d /var/run/trident
+
+chmod 644 /etc/logrotate.d/tmsd
+
+if [ ! -e /etc/trident/certificate.pem ] ; then
+    sudo -u $SERVICE_USER /usr/bin/tselfsign
+fi
+
+systemctl daemon-reload
+systemctl restart rsyslog.service
+systemctl enable tms.service
+
+if [ -e /etc/trident/tmsd.conf ]; then
+    systemctl restart tms.service
+fi

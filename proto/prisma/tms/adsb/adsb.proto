@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package prisma.tms.adsb;
+
+message Adsb {
+    string datetime = 1;
+    string modes = 2;
+    string callsign = 3;
+    int32 altitude = 4;
+    int32 ground_speed = 5;
+    int32 track = 6;
+    int32 vrate = 7;
+    int32 air_speed = 8;
+    float latitude = 9;
+    float longitude = 10;
+}

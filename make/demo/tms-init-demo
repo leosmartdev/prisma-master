@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+install -m 755 /usr/share/tms-demo/tms-recycle-demo /usr/sbin 
+install -m 644 /usr/share/tms-demo/tms-recycle-demo.crontab /etc/cron.d/tms-recycle-demo
+

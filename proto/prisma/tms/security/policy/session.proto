@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package prisma.tms.security.policy;
+
+message SessionPolicy {
+    string id = 1;
+    // v1.5 One session per user
+    string single = 2;
+    string durationIdle = 3;
+    string idleConsequence = 4;
+    string durationRenewal = 5;
+    string durationMaximum = 6;
+}

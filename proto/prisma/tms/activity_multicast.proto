@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "prisma/tms/common.proto";
+import "prisma/tms/devices/devices.proto";
+import "google/protobuf/wrappers.proto";
+import "prisma/tms/omnicom/Omnicom.proto";
+import "prisma/tms/iridium/iridium.proto";
+import "prisma/tms/sar/sarsatmessage.proto";
+
+// TODO move the EntityRelationship message to a more common location
+// since its currently just a copy of the version in the Incident proto file.
+// this can be any kind of destination needed: device, network, C2 etc ...
+message EntityRelationship {
+    string type = 1;
+    string id = 2;
+}
+message Multicast {
+    string id = 1;
+    /**
+     * List of destination to send the payload.
+     * A Destination can be any entitity in the system. Made up of two parts,
+     * a type and an ID. The type is a URI to inform the system what the ID is
+     * referencing.
+     * for example, so send a message to an OmniCom beacon, the destination would be
+     * ```
+     * [{
+     *    type: 'prisma.tms.moc.Device',
+     *    id: '1',
+     * }]
+     * ```
+     */
+    repeated EntityRelationship destinations = 2;
+    google.protobuf.Any payload = 11;
+    repeated Transmission transmissions = 3; // There will be exactly 1 transmission for each destination.
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        CANCEL = 2;
+        DELETE = 3;
+    }
+}
+
+message Transmission {
+    string id = 1;
+    string parentId = 2; // Multicast.id
+    string messageId = 3; // Message.id
+    EntityRelationship destination = 4;
+    /**
+     * The number of parts to the transmission. If the transmission
+     * to this destination has multiple messages that will be sent, or the
+     * message is large enough to split into parts, then each message or part
+     * will be a packet.
+     *
+     * The transmission is required to have at least 1 packet, since at least
+     * 1 message has to be sent to the destination.
+     */
+    repeated Packet packets = 5;
+    State state = 6;
+    ResponseStatus status = 7;
+
+    enum State {
+        nonstate = 0; // not used, zero is considered not set
+        Pending = 1;
+        Success = 2;
+        Failure = 3;
+        Partial = 4; // Partial success, some messages have failed.
+        Retry = 5; // Failed, but retrying again.
+    }
+}
+
+message Packet {
+    /*
+     * Human readable name for this packet. Can be a filename, site name,
+     * action, or some other string that may be displayed to a user.
+     * Examples:
+     *   * "OmniCom Geofence Update"
+     *   * "foo.jpg"
+     *   * "Incident #1 Transfer"
+     */
+    string name = 1;
+    string messageId = 3;
+    Transmission.State state = 5;
+    ResponseStatus status = 6;
+}
+
+message MessageActivity {
+
+    repeated Error error = 1;
+    string database_id = 2;
+    string registry_id = 3;
+    string activity_id = 4;
+    string request_id = 5;
+
+
+	oneof metaData {
+	google.protobuf.Any body = 40;
+	prisma.tms.omnicom.Omni omni = 41;
+	prisma.tms.iridium.MessageTerminatedConfirmation mtc = 42;
+	prisma.tms.iridium.MobileOriginatedLocationInformation moli = 43;
+    prisma.tms.sar.SarsatMessage sarsat = 44;
+	}
+
+    // Time at which this activity was received
+    google.protobuf.Timestamp time = 7;
+    prisma.tms.devices.DeviceType type = 8;
+
+	//NetworkIds
+	google.protobuf.StringValue  imei = 20;
+	google.protobuf.StringValue  nodeId = 21;
+
+}

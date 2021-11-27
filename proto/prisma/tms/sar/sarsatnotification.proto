@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package prisma.tms.sar;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "prisma/tms/sar/beacon.proto";
+
+/* SARSAT notification object.
+ * A SARSAT notification is made up of 1 or more SARSAT Alerts, which are combined together in a Notification based on the site number/beacon id and the time.
+ */
+message SarsatNotification {
+    string id = 1;
+
+	repeated SarsatAlert alerts = 2;
+}
+
+message SarsatAlert {
+ 	string id = 1;
+    AlertType alertType = 2;               // The type of the alert
+	int32 site_number = 3;              // The number of the site which corresponds to this alert
+    Beacon beacon = 4;                  // The Beacon for which the alert was created
+	google.protobuf.Timestamp processed_time = 5;       // The time the notification was processed by the local RCC
+	UnlocatedAlert unlocated_alert_message = 6;
+	IncidentAlert incident_alert_message = 7;
+	ResolvedAlert resolved_alert_message =8;
+	// Enum for the type of alert that we have received
+    enum AlertType {
+        UnlocatedAlert = 0;
+    	IncidentAlert = 1;
+        ResolvedAlert = 2;
+    }
+
+}
+
+message UnlocatedAlert {
+		google.protobuf.Timestamp notification_time = 3;
+		string satellite = 4;
+		string orbit_number = 5;
+}
+message IncidentAlert {
+		repeated element elemental = 3;
+		meoelemental meo_elemental = 4; 
+		Point encoded = 5;
+}
+
+message ResolvedAlert {
+		Point composite_location = 3; // The composite location for the site 
+		string composite_duration = 4;
+		repeated element elemental =5;
+		meoelemental meo_elemental = 6;
+		Point encoded = 7;
+}
+
+message meoelemental {
+		string satellite = 1;
+		google.protobuf.Timestamp notification_time = 2;
+		DOA doa = 3; // The DOA location for the site
+
+}
+
+message element {
+		repeated Doppler doppler = 1;
+        google.protobuf.Timestamp notification_time = 2;
+		string satellite = 3;
+		string orbit_number = 4;
+}
+
+message SarLocations {
+    repeated Doppler doppler = 1;
+    DOA doa = 2;
+}
+
+message Doppler {
+    DopplerType type = 1;
+    Point doppler_position = 2;
+    google.protobuf.DoubleValue doppler_probability = 3;
+     enum DopplerType {
+        A = 0;
+        B = 1;
+    }
+}
+
+message DOA {
+    Point doa_position = 1;
+    google.protobuf.DoubleValue altitude = 2; 
+
+}
+
+message GNSS {
+	Point gnss = 1;
+}
+
+message Point {
+    double latitude = 1;
+    double longitude = 2;
+}

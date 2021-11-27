@@ -1,0 +1,44 @@
+#!/usr/bin/python
+import sys
+import subprocess
+import json
+import time
+
+def handle_process(process):
+	while True:
+		nerr = 0
+		for p in process:
+			if p.returncode is None and p.poll() is not None:
+				print("A tnoid is dead :(. Error code is %d" % p.returncode)
+				nerr += 1
+				continue
+		if nerr == len(process):
+			print("All tnoids are dead ):")
+			return
+		time.sleep(2)
+
+def main():
+	if len(sys.argv) != 2:
+		print("use: %s <file with station>" % sys.argv[0])
+		return
+	# here will be handles of processes
+	process_tnoids = []
+	with open(sys.argv[1]) as f:
+		stations = json.load(f)
+		print("got %d stations" % len(stations))
+		for i, station in enumerate(stations):
+			if station.get('addr') is None:
+				print("station #%d is broken" % i)
+				continue
+			process_tnoids.append(subprocess.Popen(["tnoid", "--address", station['addr']]))
+	print("Have %d working tnoids" % len(process_tnoids))
+	try:
+		handle_process(process_tnoids)
+	except BaseException as error:
+		print("got exception: %s" % str(error))
+		for p in process_tnoids:
+			if p.returncode is None:
+				p.kill()
+
+if __name__ == '__main__':
+	main()

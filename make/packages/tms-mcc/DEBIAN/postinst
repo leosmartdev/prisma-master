@@ -1,0 +1,20 @@
+#!/bin/bash
+
+SERVICE_USER=prisma
+
+if ! $(id vsftpd >/dev/null 2>&1) ; then
+    useradd --home /home/vsftpd --gid nogroup -m --shell /bin/false vsftpd
+fi
+
+install -m 644 /usr/share/tms-mcc/vsftpd.conf /etc/vsftpd.conf
+install -m 644 /usr/share/tms-mcc/vsftpd.pam /etc/pam.d/vsftpd
+
+if [ ! -e /etc/trident/vsftpd.passwd ] ; then
+    install -m 644 /usr/share/tms-mcc/vsftpd.passwd /etc/trident/vsftpd.passwd
+fi
+
+if [ ! -d /srv/ftp/test ] ; then
+    install -o vsftpd -g $SERVICE_USER -m 775 -d /srv/ftp/test
+fi
+
+systemctl restart vsftpd.service

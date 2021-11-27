@@ -1,0 +1,1536 @@
+//
+// Copyright 2010 Techno-Sciences Inc.  All Rights Reserved.
+//
+// Techno-Sciences
+// 11750 Beltsville Dr.
+// Beltsville MD  20705
+//
+
+syntax = 'proto3';
+
+import "prisma/tms/nmea/m1371.proto";
+
+import "google/protobuf/timestamp.proto";
+
+package prisma.tms.nmea;
+
+option java_package="com.technosci.tms.message";
+option java_outer_classname="NmeaMessage";
+
+//
+// messages used to correspond to Nmea sentences
+//
+// message types 2001-2999
+//
+
+
+message Nmea {
+    string original_string = 10; // The original NMEA string
+    repeated string errors = 1; // errors found parsing or validating nmea
+
+    string sos = 2; // ! or $
+    string talker = 3; // nmea talker number see NmeaTalker.h
+    string format = 4; // nmea format number see NmeaFormat.h
+
+    // NOTE this is a special Nmea that is a little different then the
+    //      average nmea sentence in that it has a different format,
+    //      $ssddQ,xxx*hh
+    string destination_talker = 5; // special query nmea only
+    Query query = 81; // Request state info from a NMEA device
+
+    // NOTE these numbers are the sentences that we implement,
+    //      their protobuf number is defined as in python:
+    //      '%02d%02d%02d' % (ord('Z'), ord('Z'), ord('Z'))
+    //      these are all 148 approved nmea 0183 4.0 spec sentences
+
+// Aam aam = 656577; // Waypoint Arrival Alarm
+ Abk abk = 656675; // AIS Addressed and Binary Broadcast Acknowledgement
+ Abm abm = 656677; // AIS Addressed Binary and Safety Related Message.
+ Aca aca = 656765; // AIS Regional Channel Assignment Message
+// Acf acf = 656770; // General AtoN Station Configuration Command
+// Acg acg = 656771; // Extended General AtoN Station Configuration Command
+// Ack ack = 656775; // Acknowledge Alarm
+ Acm acm = 656777; // AIS Base Station Addressed Channel Management Command
+// Acs acs = 656783; // AIS Channel Management Information Source
+ Ads ads = 656883; // Automatic Device Status
+// Afb afb = 657066; // AtoN Forced Broadcast Command
+ Aga aga = 657165; // AIS Base Station Broadcast of a Group Assignment Command
+// Aid aid = 657368; // AtoN IDentification Configuration Command
+ Air air = 657382; // AIS Interrogation Request
+// Akd akd = 657568; // Acknowledge Detail Alarm Condition
+// Ala ala = 657665; // Set Detail Alarm Condition
+// Alm alm = 657677; // GPS Almanac Data
+ Alr alr = 657682; // Set Alarm State
+// Apb apb = 658066; // Heading/Track Controller (Autopilot) Sentence "B"
+ Asn asn = 658378; // AIS Base Station Broadcast of Assignment Command
+ Bbm bbm = 666677; // AIS Broadcast Binary Message
+ Bcg bcg = 666771; // Base Station Configuration, General Command
+ Bcl bcl = 666776; // Base Station Configuration, Location Command
+// Bec bec = 666967; // Bearing & Distance to Waypoint, Dead Reckoning
+// Bod bod = 667968; // Bearing - Origin to Destination
+// Bwc bwc = 668767; // Bearing & Distance to Waypoint, Great Circle
+// Bwr bwr = 668782; // Bearing & Distance to Waypoint, Rhumb Line
+// Bww bww = 668787; // Bearing, Waypoint to Waypoint
+// Cbr cbr = 676682; // Configure Broadcast Rates for AIS AtoN Station Message Command.
+// Cek cek = 676975; // Configure Encryption Key Command
+// Cop cop = 677980; // Configure the Operational Period, Command
+// Cpc cpc = 678067; // Configure Parameter-code for UNIX Time Parameter (c)
+// Cpd cpd = 678068; // Configure Parameter-code for Destination-identification Parameter (d)
+// Cpg cpg = 678071; // Configure Parameter-code for the Sentence-Grouping Parameter (g)
+// Cpn cpn = 678078; // Configure Parameter-code for the Line-count Parameter (n)
+// Cpr cpr = 678082; // Configure Parameter-code for Relative (epoch / event) Time Parameter (r)
+// Cps cps = 678083; // Configure Parameter-code for the Source-identification Parameter(s)
+// Cpt cpt = 678084; // Configure Parameter-code for a Text-string Parameter (t)
+// Cur cur = 678582; // Water Current Layer
+// Dbt dbt = 686684; // Depth Below Transducer
+// Dcn dcn = 686778; // DECCA position
+// Dcr dcr = 686782; // Device Capability Report
+// Ddc ddc = 686867; // Display Dimming Control
+ Dlm dlm = 687677; // Data Link Management Slot Allocations for Base Station Command
+// Dor dor = 687982; // Door Status Detection
+// Dpt dpt = 688084; // Depth
+// Dsc dsc = 688367; // Digital Selective Calling Information
+// Dse dse = 688369; // Expanded Digital Selective Calling
+// Dsi dsi = 688373; // DSC Transponder Initialize
+// Dsr dsr = 688382; // DSC Transponder Response
+// Dtm dtm = 688477; // Datum Reference
+ Ecb ecb = 696766; // Configure Broadcast Schedules for Base Station Messages, Command
+// Etl etl = 698476; // Engine Telegraph Operation Status
+// Eve eve = 698669; // General Event Message
+// Fir fir = 707382; // Fire Detection
+// Fsi fsi = 708373; // Frequency Set Status or Command
+ Fsr fsr = 708382; // Frame Summary of AIS Reception
+// Gbs gbs = 716683; // GNSS Satellite Fault Detection
+// Gen gen = 716978; // Generic Status Information
+ Gga gga = 717165; // Global Positioning System Fix Data
+// Glc glc = 717667; // Geographic Position, Loran-C
+ Gll gll = 717676; // Geographic Position, Latitude/Longitude
+// Gmp gmp = 717780; // GNSS Map Projection Fix Data
+// Gns gns = 717883; // GNSS Fix Data
+// Grs grs = 718283; // GNSS Range Residuals
+// Gsa gsa = 718365; // GNSS DOP and Active Satellites
+// Gst gst = 718384; // GNSS Pseudorange Error Statistics
+// Gsv gsv = 718386; // GNSS Satellites In View
+// Hdg hdg = 726871; // Heading, Deviation & Variation
+// Hdt hdt = 726884; // Heading, True
+// Hmr hmr = 727782; // Heading Monitor Receive
+// Hms hms = 727783; // Heading Monitor Set
+// Hsc hsc = 728367; // Heading Steering Command
+// Hss hss = 728383; // Hull Stress Surveillance Systems
+// Htc htc = 728467; // Heading/Track Control Command
+// Htd htd = 728468; // Heading/Track Control Data
+// Lcd lcd = 766768; // Loran-C Signal Data
+// Lr1 lr1 = 768249; // AIS Long-range Reply Sentence 1
+// Lr2 lr2 = 768250; // AIS Long-range Reply Sentence 2
+// Lr3 lr3 = 768251; // AIS Long-range Reply Sentence 3
+// Lrf lrf = 768270; // AIS Long-Range Function
+// Lri lri = 768273; // AIS Long-Range Interrogation
+// Meb meb = 776966; // Message Input for Broadcast, Command
+// Mla mla = 777665; // GLONASS Almanac Data
+// Msk msk = 778375; // MSK Receiver Interface Command
+// Mss mss = 778383; // MSK Receiver Signal
+// Mtw mtw = 778487; // Water Temperature
+// Mwd mwd = 778768; // Wind Direction & Speed
+// Mwv mwv = 778786; // Wind Speed & Angle
+ Nak nak = 786575; // Negative Acknowledgement
+// Nrm nrm = 788277; // NAVTEX Receiver Mask Command
+// Nrx nrx = 788288; // NAVTEX Received Message
+ Osd osd = 798368; // Own Ship Data
+// Prc prc = 808267; // Propulsion Remote Control Status
+// Rma rma = 827765; // Recommended Minimum Specific Loran-C Data
+// Rmb rmb = 827766; // Recommended Minimum Navigation Information
+ Rmc rmc = 827767; // Recommended Minimum Specific GNSS Data
+// Ror ror = 827982; // Rudder Order Status
+// Rot rot = 827984; // Rate Of Turn
+// Rpm rpm = 828077; // Revolutions
+// Rsa rsa = 828365; // Rudder Sensor Angle
+ Rsd rsd = 828368; // Radar System Data
+ Rst rst = 828384; // Equipment Reset Command
+// Rte rte = 828469; // Routes RTE, Routes
+// Sfi sfi = 837073; // Scanning Frequency Information Status and Command
+ Sid sid = 837368; // Set an Equipment's IDentification and Command
+ Spo spo = 838079; // Select AIS Device's Processing and Output, Command
+// Ssd ssd = 838368; // AIS Ship Static Data
+// Stn stn = 838478; // Multiple Data ID
+// Tbr tbr = 846682; // TAG Block Report Request
+// Tbs tbs = 846683; // TAG Block listener Source-identification Configuration Command
+ Tfr tfr = 847082; // Transmit Feed-Back Report
+// Ths ths = 847283; // True Heading and Status
+ Tlb tlb = 847666; // Target Label
+ Tll tll = 847676; // Target Latitude and Longitude
+// Tpc tpc = 848067; // Transmit Slot Prohibit, Command
+// Trc trc = 848267; // Thruster Control Data
+// Trd trd = 848268; // Thruster Response Data
+ Tsa tsa = 848365; // Transmit Slot Assignment
+ Tsp tsp = 848380; // Temporary Transmit Slot Prohibit
+ Tsr tsr = 848382; // Transmit Slot Prohibit Status Report
+// Ttd ttd = 848468; // Tracked Target Data
+ Ttm ttm = 848477; // Tracked Target Message
+// Tut tut = 848584; // Transmission of Multi-language Text
+ Txt txt = 848884; // Text Transmission
+// Uid uid = 857368; // User Identification Code Transmission
+// Vbw vbw = 866687; // Dual Ground/Water Speed
+Vdm vdm = 866877; // AIS VHF Data-link Message
+Vdo vdo = 866879; // AIS VHF Data-Link Own-Vessel Report
+// Vdr vdr = 866882; // Set & Drift
+ Ver ver = 866982; // Version
+// Vhw vhw = 867287; // Water Speed and Heading
+// Vlw vlw = 867687; // Dual Ground/Water Distance
+// Vpw vpw = 868087; // Speed, Measured Parallel to Wind
+// Vsd vsd = 868368; // AIS Voyage Static Data
+ Vsi vsi = 868373; // VDL Signal Information
+ Vtg vtg = 868471; // Course Over Ground & Ground Speed
+// Wat wat = 876584; // Water Level Detection
+// Wcv wcv = 876786; // Waypoint Closure Velocity
+// Wnc wnc = 877867; // Distance, Waypoint to Waypoint
+// Wpl wpl = 878076; // Waypoint Location
+// Xdr xdr = 886882; // Transducer Measurements
+// Xte xte = 888469; // Cross-Track Error, Measured
+// Xtr xtr = 888482; // Cross-Track Error, Dead Reckoning
+ Zda zda = 906865; // Time & Date
+// Zdl zdl = 906876; // Time & Distance to Variable Point
+// Zfo zfo = 907079; // UTC & Time from Origin Waypoint
+// Ztg ztg = 908471; // UTC & Time to Destination Waypoint
+//
+
+
+//  NOTE MSTT NMEA msgs have 3,4 or 5 letter codes so the general NMEA
+//  scheme wont work lets start numbering from 1000001 (Shafiq)
+
+ Dlps dlps = 1000001; // Data Load Profile Strings
+ Drpc drpc = 1000002; // Data Reset Profile Chain
+ Scpr scpr = 1000003; // Command Set Current Profile
+ Scpa scpa = 1000004; // Command Set Current Parameters
+ Cdt  cdt = 1000005; // Command Drop Track
+ Cpfac cpfac = 1000006; // Command PFA Change
+ Cpfc  cpfc = 1000007; // Command PF Change
+ Cct  cct = 1000008; // Command Create Track
+ Cst  cst = 1000009; // Command Select Track
+ Ctc  ctc = 1000010; // Command Correct Track
+ Cqrr cqrr = 1000011; // Command Query Radar RPM
+ Crsc crsc = 1000012; // Command Radar State Control
+ Csdm csdm = 1000013; // Command Shutdown MSTT
+ Rs rs = 1000014; // Response String
+ Ts ts = 1000015; // Track Size
+ Ecef ecef = 1000016; // Track Covariances
+
+ Brs brs = 1000050; // Undefined Broadcast
+
+} // message Nmea
+
+// $ssddQ,xxx,hh;
+// ss - the source talker
+// dd - the destination talker
+// Q - indicates that this is the special query format
+// xxx - this is the requested nmea message's format code
+message Query {
+     string req_format = 7;
+}
+
+// $--ZDA,hhmmss.ss,xx,xx,xxxx,xx,xx*hh
+message Zda {
+     double utc_time = 1; // HHMMSS.ss
+     bool utc_time_validity = 7;
+     uint32 day = 2;
+     bool day_validity = 8;
+     uint32 month = 3;
+     bool month_validity = 9;
+     uint32 year = 4;
+     bool year_validity = 10;
+     int32 local_zone_hours = 5; // +/- 00 to 13 hours
+     bool local_zone_hours_validity = 11;
+     uint32 local_zone_minutes = 6; // + 00 to 59 minutes
+     bool local_zone_minutes_validity = 12;
+}
+
+// $--RMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,xxxxxx,x.x,a,a*hh
+message Rmc {
+     double utc_time = 1; // full date and time of position fix in ms
+     bool utc_time_validity = 13;
+     string status = 2; // A = data valid, V = navigation receiver warning, D = differential
+     bool status_validity = 14;
+     double latitude = 3; // xxxx.xx
+     bool latitude_validity = 15;
+     string latitude_direction = 4; // N/S
+     bool latitude_direction_validity = 16;
+     double longitude = 5; // xxxxx.xx
+     bool longitude_validity = 17;
+     string longitude_direction = 6; // E/W
+     bool longitude_direction_validity = 18;
+     double speed_over_ground = 7; // x.x in knots
+     bool speed_over_ground_validity = 19;
+     double course_over_ground = 8; // xxxxxx in degrees True
+     bool course_over_ground_validity = 20;
+     uint32 utc_date = 9;
+     bool utc_date_validity = 21;
+     double magnetic_variation = 10; // x.x in degrees
+     bool magnetic_variation_validity = 22;
+     string magnetic_variation_direction = 11; // E/W
+     bool magnetic_variation_direction_validity = 23;
+     string mode_indicator = 12; // A = autonomous, D = differential, E = estimated (dead reckoning), M = manual, S = Simulator, N = invalid
+     bool mode_indicator_validity = 24;
+}
+
+// $--TXT,xx,xx,xx,c--c*hh
+// NOTE text_message may use 'code delimiters' as defined by section 5.1.3
+message Txt {
+     uint32 sentence_count = 1; // 01 to 99
+     bool sentence_count_validity = 5;
+     uint32 sentence_index = 2; // 01 to 99
+     bool sentence_index_validity = 6;
+     uint32 text_identifier = 3; // 01 to 99
+     bool sentence_indentifier_validity = 7;
+     string text_message = 4; // up to 61 characters
+     bool text_message_validity = 8;
+}
+
+// $--TLB,x.x,c--c,x.x,c--c, … x.x,c--c*hh
+message Tlb {
+	repeated NumNamePair target_name_pair = 1;
+}
+
+message NumNamePair {
+	 uint32 number = 1;
+	 string label = 2;
+}
+
+// $--TLL,xx,llll.ll,a,yyyyy.yy,a,c--c,hhmmss.ss,a,a*hh
+message Tll {
+     uint32 number = 1; // 00 to 99, but often extended beyond
+     bool number_validity = 8;
+     double latitude = 2; // xxxx.xx
+     bool latitude_validity = 9;
+     double longitude = 3; // xxxxx.xx
+     bool longitude_validity = 10;
+     string name = 4; // target name
+     bool name_validity = 11;
+     google.protobuf.Timestamp utc = 5; 
+     bool utc_validity = 12;
+     string status = 6; // L = lost, Q = query, T = tracking
+     bool status_validity = 13;
+     string reference = 7; // R if target is reference target
+     bool reference_validity = 14;
+}
+
+// $--TTM,xx,x.x,x.x,a,x.x,x.x,a,x.x,x.x,a,c--c,a,a,hhmmss.ss,a*hh
+message Ttm {
+     uint32 number = 1; // 00 to 99, but often extended beyond
+     bool number_validity = 16;
+     double distance = 2; // x.x in ?units TODO from own ship
+     bool distance_validity = 17;
+     double bearing = 3; // x.x in degrees from own ship
+     bool bearing_validity = 18;
+     string bearing_relative = 4; // T = true, R = relative
+     bool bearing_relative_validity = 19;
+     double speed = 5; // x.x in ?units TODO
+     bool speed_validity = 20;
+     double course = 6; // x.x in degrees
+     bool course_validity = 21;
+     string course_relative = 7; // T = true, R = relative
+     bool course_relative_validity = 22;
+     double cpa_distance = 8; // x.x in unknown TODO
+     bool cpa_distance_validity = 23;
+     double cpa_time = 9; // x.x in minutes
+     bool cpa_time_validity = 24;
+     string speed_distance_units = 10; // K/N/S units for speed
+     bool speed_distance_units_validity = 25;
+     string name = 11; // target name
+     bool name_validity = 26;
+     string status = 12; // L = lost, Q = query, T = tracking
+     bool status_validity = 27;
+     string reference = 13; // R if target is reference target
+     bool reference_validity = 28;
+     double utc_time = 14; // time of data
+     bool utc_time_validity = 29;
+     string acquisition_type = 15; // A = auto, M = manual, R = reported
+     bool acquisition_type_validity = 30;
+}
+
+// !--ABK,xxxxxxxxx,a,x.x,x,x*hh
+// reply to ABM, AIR, BBM message
+message Abk {
+     uint32 destination_id = 1; // addressed AIS unit
+     bool destination_id_validity = 6;
+     string received_channel = 2; // A or B channel
+     bool received_channel_validity = 7;
+     uint32 message_id = 3; // which ITU-R M.1371 message was used?
+     bool message_id_validity = 8;
+     uint32 seq_msg_id = 4; // message sequence id this acks
+     bool seq_msg_id_validity = 9;
+     uint32 ack_type = 5; // Type of acknowledgement
+     bool ack_type_validity = 10;
+}
+
+// $--AIR,xxxxxxxxx,x.x,x,x.x,x,xxxxxxxxx,x.x,x,a,x.x,x.x,x.x*hh
+message Air {
+    // possible message id values:
+    // station: 3, 5, 9, 18, 19, 21, 24
+    // for base station: 4, 24
+
+     uint32 destination_1_id = 1; // the 1st mmsi dest
+     bool destionation_1_id_validity = 13;
+     uint32 message_1_1_id = 2; // reqested msg for dest 1
+     bool destionation_1_1_id_validity = 14;
+     uint32 message_1_1_sub_id = 3; // requested submsg for dest 1
+     bool destionation_1_1_sub_id_validity = 15;
+     uint32 message_1_2_id = 4; // reqested msg for dest 1
+     bool destionation_1_2_id_validity = 16;
+     uint32 message_1_2_sub_id = 5; // requested submsg for dest 1
+     bool message_1_2_sub_id_validity = 17;
+
+     uint32 destination_2_id = 6; // the 2nd mmsi dest
+     bool destination_2_id_validity = 18;
+     uint32 message_2_1_id = 7; // reqested msg for dest 2
+     bool message_2_1_id_validity = 19;
+     uint32 message_2_1_sub_id = 8; // requested submsg for dest 2
+     bool message_2_1_sub_id_validity = 20;
+
+     string channel = 9; // A or B
+     bool channel_validity = 21;
+
+     uint32 slot_offset_1_1 = 10;
+     bool slot_offset_1_1_validity = 22;
+     uint32 slot_offset_1_2 = 11;
+     bool slot_offset_1_2_validity = 23;
+     uint32 slot_offset_2_1 = 12;
+     bool slot_offset_2_1_validity = 24;
+}
+
+// $--ALR,hhmmss.ss,xxx,A,A,c--c*hh
+message Alr {
+     double utc_time = 1; // HHMMSS.ss
+     bool utc_time_validity = 6;
+     uint32 alarm_id = 2; // xxx
+     bool alarm_id_validity = 7;
+     string alarm_condition = 3; // A = threshold exceeded, V = not
+     bool alarm_condition_validity = 8;
+     string alarm_ack = 4; // A = acknowledged, V = not
+     bool alarm_ack_validity = 9;
+     string alarm_desc = 5; // alarm description
+     bool alarm_desc_validity = 10;
+}
+
+// !--ABM,x,x,x,xxxxxxxxx,x,xx,s--s,x*hh
+message Abm {
+     uint32 sentence_count = 1; // 1 to 9
+     bool sentence_count_validity = 9;
+     uint32 sentence_index = 2; // 1 to 9
+     bool sentence_index_validity = 10;
+     uint32 seq_msg_id = 3; // 0 to 3
+     bool seq_msg_id_validity = 11;
+     uint32 destination_id = 5; // mmsi of the destination AIS unit
+     bool destination_id_validity = 12;
+     uint32 channel = 4; // A or B channel
+     bool channel_validity = 13;
+     uint32 message_id = 6; // encapsulated message id (6,12)
+     bool message_id_validity = 14;
+     string text = 7; // the text message to be encapsulated
+     bool text_validity = 15;
+     uint32 fill_bits = 8; // 0 to 5
+     bool fill_bits_validity = 16;
+}
+
+// !--BBM,x,x,x,x,xx,s--s,x*hh
+message Bbm {
+     uint32 sentence_count = 1; // 1 to 9
+     bool sentence_count_validity = 9;
+     uint32 sentence_index = 2; // 1 to 9
+     bool sentence_index_validity = 10;
+     uint32 seq_msg_id = 3; // 0 to 3
+     bool seq_msg_id_validity = 11;
+     uint32 channel = 4; // A or B channel
+     bool channel_validity = 13;
+     uint32 message_id = 6; // encapsulated message id (6,12)
+     bool message_id_validity = 14;
+     string text = 7; // the text message to be encapsulated
+     bool text_validity= 15;
+     uint32 fill_bits = 8; // 0 to 5
+     bool fill_bits_validity = 16;
+}
+
+// $--SPO,c--c,a,x,x,x,x,x,x,x,x,x,x,x,x,a*hh
+// Used to configure the content and output for measurements made on
+// selected channels during operation of a Base Station or a Receiving
+// Station.
+//
+// Fields expected values are repeated multiple times, so they are listed
+// here instead of following each field.
+//
+// Type Three / Four:
+//      0 = no output, 
+//      1 = continuous output, 
+//      2 = output next frame only
+// Type Five:
+//      0 = off/disabled
+//      1 = on/enabled
+// Type Six:
+//      R = Sentence is a status report of current settings
+//      C = Sentence is a configuration command to change settings
+//      NULL = R
+//
+// NOTE The NMEA 0183 4.0 spec says that vdl_signal_to_noise_ratio is of
+//      type 6, but this appears to be wrong, and doesn't make sense. It
+//      should be a 4 or 5. Only sentence_status makes sense for type 6.
+//
+//
+message Spo {
+     string station_id = 1; // up to 15 char
+     bool station_id_validity  = 15;
+     string channel_selection = 2; // A, B, E = every channel, N = no VSI or FSR sentences about any channel
+     bool channel_selection_validity = 16;
+     uint32 vdl_signal_strength = 3; // type 3
+     bool vdl_signal_strength_validity = 17;
+     uint32 vdl_first_slot_number = 4; // type 4
+     bool vdl_first_slot_number_validity = 18;
+     uint32 vdl_utc_time = 5; // type 5
+     bool vdl_utc_time_validity = 19;
+     string vdl_signal_to_noise_ratio = 6; // type 4
+     bool vdl_signal_to_noise_ratio_validity = 20;
+
+     uint32 fsr_slots_occupied = 7; // type 4
+     bool fsr_slots_occupied_validity = 21;
+     uint32 fsr_crc_failure_count = 8; // type 4
+     bool fsr_crc_failure_count_validity = 22;
+     uint32 fsr_slot_reservations = 9; // type 4
+     bool fsr_slot_reservations_validity = 23;
+     uint32 fsr_average_noise_level = 10; // type 4
+     bool fsr_average_noise_level_validity = 24;
+     uint32 fsr_slots_above_noise_count = 11; // type 4
+     bool fsr_slots_above_noise_count_validity = 25;
+
+     uint32 vsi_foreach_vdm = 12; // type 5
+     bool vsi_foreach_vdm_validity = 26;
+     uint32 fsr_foreach_frame = 13; // type 5
+     bool fsr_foreach_frame_validity = 27;
+
+     string sentence_status = 14; // type 6
+     bool sentence_status_validity = 28;
+}
+
+// !--VDM,x,x,x,a,s--s,x*hh
+message Vdm {
+     uint32 sentence_count = 1; // 1 to 9
+     uint32 sentence_index = 2; // 1 to 9
+     uint32 seq_msg_id = 3; // 0 to 9
+     string channel = 4; // A or B channel
+     M1371 m1371 = 5; // the decoded message
+     uint32 fill_bits = 6; // 0 to 5
+}
+
+// !--VDO,x,x,x,a,s--s,x*hh
+// Is the same as the Vdm message, but is for their own vessel
+message Vdo {
+     uint32 sentence_count = 1; // 1 to 9
+     uint32 sentence_index = 2; // 1 to 9
+     uint32 seq_msg_id = 3; // 0 to 9
+     string channel = 4; // A or B channel
+     M1371 m1371 = 5; // the decoded message
+     uint32 fill_bits = 6; // 0 to 5
+}
+
+
+// $--VSI,c--c,x,hhmmss.ss,x.x,x.x,x.x*hh
+message Vsi {
+     string station_id = 1; // up to 15 char
+     uint32 seq_msg_id = 2; // the seq_msg_id from the vdm/o msg
+     double utc_time = 3; // HHMMSS.ss
+     uint32 slot_number = 4;
+     double signal_strength = 5;
+     double signal_to_noise_ratio = 6;
+}
+
+// $--FSR,c--c,hhmmss.ss,a,x.x,x.x,x.x,x.x,x.x,x.x,x.x*hh
+message Fsr {
+     string station_id = 1; // up to 15 char
+     double utc_time = 2; // HHMMSS.ss
+     string channel = 3; // A or B
+     uint32 slots_occupied_by_messages_received = 4; 
+     uint32 slots_occupied_by_base_station = 5;
+     uint32 crc_failure_count = 6;
+     uint32 external_slot_reservations = 7;
+     uint32 base_station_slot_reservations = 8;
+     double average_noise_level = 9;
+     uint32 slots_above_noise_count = 10;
+}
+
+// $--ADS,c--c,hhmmss.ss,a,x,a,a*hh
+// Output by the nmea device tnoid is talking to, it is the device's status
+message Ads {
+     string station_id = 1; // up to 15 char
+     bool station_id_validity = 7;
+     double utc_time = 2; // HHMMSS.ss
+     bool utc_time_validity = 8;
+     string alarm_status = 3; // A = active, V = not acitve
+     bool alarm_status_validity = 9;
+     uint32 time_sync_method = 4; // 0 to 9
+     bool time_sync_method_validity = 10;
+     string position_source = 5; // I = internal, E = external, S = surveyed, N = None
+     bool position_source_validity = 11;
+     string utc_timing_source = 6; // E = external, I = internal, N = None
+     bool utc_timing_source_validity = 12;
+}
+
+// $--VTG,x.x,T,x.x,M,x.x,N,x.x,K,a*hh
+message Vtg {
+     double course_over_ground = 1;
+     bool course_over_ground_validity = 10;
+     string degrees_true = 2;
+     bool degrees_true_validity = 11;
+     double course_over_ground_magnetic = 3;
+     bool ourse_over_ground_magnetic_validity = 12;
+     string degrees_magnetic = 4;
+     bool degrees_magnetic_validity = 13;
+     double speed_over_ground_knots = 5;
+     bool speed_over_ground_knots_validity = 14;
+     string knots = 6;
+     bool knots_validity = 15;
+     double speed_over_ground_kph = 7;
+     bool speed_over_ground_kph_validity = 16;
+     string kilometers = 8;
+     bool kilometers_validity = 17;
+     string mode_indicator = 9;
+     bool mode_indicator_validity = 18;
+}
+
+// $--GGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh
+message Gga {
+     double utc_time = 1; // HHMMSS.ss
+     bool utc_time_validity = 15;
+     double latitude = 2; // xxxx.xx
+     bool latitude_validity = 16;
+     string latitude_direction = 3; // N/S
+     bool latitude_direction_validity = 17;
+     double longitude = 4; // xxxxx.xx
+     bool longitude_validity = 18;
+     string longitude_direction = 5; // E/W
+     bool longitude_direction_validity = 19;
+     string status = 6; // 0 - 8
+     bool status_validity = 20;
+     uint32 satellite_count = 7; // 0 - 12
+     bool satellite_count_validity = 21;
+     double hdop = 8; // horizontal dilution of precission
+     bool hdop_validity = 22;
+     double antenna_altitude = 9;
+     bool antenna_altitude_validity = 23;
+     string m1 = 10; // letter M for meters
+     bool m1_validity = 24;
+     double geoidal_separation = 11;
+     bool geoidal_separation_validity = 25;
+     string m2 = 12; // letter M for meters
+     bool m2_validity = 26;
+     uint32 dgps_age = 13; // differential GPS
+     bool dgps_age_validity = 27;
+     uint32 dgps_id = 14; // station id for differential gps
+     bool dgps_id_validity = 28;
+}
+
+// $--GLL,llll.ll,a,yyyyy.yy,a,hhmmss.ss,A,a*hh
+message Gll {
+     double latitude = 3; // xxxx.xx
+     bool latitude_validity = 10;
+     string latitude_direction = 4; // N/S
+     bool latitude_direction_validity = 11;
+     double longitude = 5; // xxxxx.xx
+     bool longitude_validity = 12;
+     string longitude_direction = 6; // E/W
+     bool longitude_direction_validity = 13;
+     double utc_time = 7;
+     bool utc_time_validity = 14;
+     string status = 8;
+     bool status_validity = 15;
+     string mode_indicator = 9;
+     bool mode_indicator_validity = 16;
+}
+
+// $--RSD,x.x,x.x,x.x,x.x,x.x,x.x,x.x,x.x,x.x,x.x,x.x,a,a*hh
+message Rsd {
+     double origin_1_range = 1;
+     bool origin_1_range_validity = 14;
+     double origin_1_bearing = 2;
+     bool origin_1_bearing_vlidity = 15;
+     double variable_range_marker_1 = 3;
+     bool variable_range_marker_1_validity = 16;
+     double electronic_bearing_line_1 = 4;
+     bool electronic_bearing_line_1_validity = 17;
+
+     double origin_2_range = 5;
+     bool origin_2_range_validity = 18;
+     double origin_2_bearing = 6;
+     bool origin_2_bearing_validity = 19;
+     double variable_range_marker_2 = 7;
+     bool variable_range_marker_2_validity = 20;
+
+     double electronic_bearing_line_2 = 8;
+     bool electronic_bearing_line_2_validity = 21;
+
+     double cursor_range = 9;
+     bool cursor_range_validity = 22;
+     double cursor_bearing = 10;
+     bool cursor_bearing_validity = 23;
+     double range_scale = 11;
+     bool range_scale_validity = 24;
+
+     string range_units = 12;
+     bool range_units_validity = 25;
+     string display_rotation = 13;
+     bool display_rotation_validty = 26;
+}
+
+// $--OSD,x.x,A,x.x,a,x.x,a,x.x,x.x,a*hh
+message Osd {
+     double heading = 1;
+     bool heading_validity = 10;
+     string degrees_true = 2;
+     bool degrees_true_validity = 11;
+     double course = 3;
+     bool course_validity = 12;
+     string course_reference = 4;
+     bool course_reference_validity = 13;
+     double speed = 5;
+     bool speed_validity = 14;
+     string speed_reference = 6;
+     bool speed_reference_validity = 15;
+     double set = 7;
+     bool set_validity = 16;
+     double drift = 8;
+     bool drift_validity = 17;
+     string speed_units = 9;
+     bool speed_units_validity = 18;
+}
+
+// $--NAK,cc,ccc,c--c,x.x,c--c*hh
+// Reason codes (ack_code):
+// 0 = Query functionality not supported
+// 1 = Sentence formatter not supported
+// 2 = Sentence formatter supported, but not enabled
+// 3 = Sentence formatter supported and enabled, but temporarily
+//     unavailable (e.g. data field problem, unit in initialize state,
+//     or in diagnostic state, etc.)
+// 4 = Sentence formatter supported, but query for this sentence
+//     formatter is not supported.
+// 5 = Access denied, for sentence formatter requested
+// 6 = Sentence not accepted due to bad checksum
+// 7 = Sentence not accepted due to listener processing issue
+// 8 to 9: reserved for future use
+// 10 = Cannot perform the requested operation.
+// 11 = Cannot fulfill request or command because of a problem with a
+//      data field in the sentence.
+// 12 to 48: reserved for future use
+// 49 = other reason as described in data field 5.
+// Values greater than 50 may be defined by equipment standards.
+message Nak {
+     string reply_talker = 1; // cc
+     bool reply_talker_validity = 6;
+     string reply_format = 2; // ccc
+     bool reply_format_validity = 7;
+     string device_id = 3; // 15 char unique id for the device
+     bool device_id_validity = 8;
+     uint32 ack_code = 4; // reason code for neg ack
+     bool ack_code_validity = 9;
+     string ack_desc = 5; // description of reason
+     bool ack_desc_validity = 10;
+}
+
+// $--TFR,x,x,a,c--c,xxxx,x.x,xxxx,x.x,x,x,x.x*hh
+// Transmit Feed-Back Report
+//
+// Status codes:
+// 0 = successfully scheduled for transmission
+// 1 = successfully scheduled for transmission by overriding an internal
+//     message with a lower priority
+// 2 = successfully scheduled for a transmission time greater than 12
+//     hours from the present time
+// 3 = not scheduled because requested transmission exceeded available
+//     memory
+// 4 = successfully removed from schedule
+// 5 = not scheduled because requested transmission conflicted with
+//     slot(s) requested by an internal Base Station process that has
+//     the same or higher priority
+// 6 = not scheduled because requested message type is not allowed by the
+//     Base Station configuration
+// 7 = not scheduled because requested message conflict to prohibit slots.
+// 8 = configuration error.
+// 9 = not scheduled because requested transmission is for a disabled
+//     channel
+// 10 = not scheduled because of invalid TSA content (e.g. invalid slot
+//      number)
+// 11 = successfully scheduled for transmission by overriding an
+//      externally requested message with a lower priority
+// 12 = not scheduled because requested transmission conflicts with
+//      previously scheduled transmission with same or higher priority
+message Tfr {
+     uint32 vdm_sentence_count = 1;
+     bool vdm_sentence_count_validity = 12;
+     uint32 vdm_seq_msg_id = 2;
+     bool vdm_seq_msg_id_validity = 13;
+     string vdm_channel = 3;
+     bool vdm_channel_validity = 14;
+     string station_id = 4; // 15 char uinque id for station device
+     bool station_id_validity = 15;
+
+     uint32 req_utc_frame = 5; // HHMM of requested transmission
+     bool req_utc_frame_validity = 16;
+     uint32 req_slot_number = 6; // slot of requested transmission
+     bool req_slot_number_validity = 17;
+     uint32 assigned_utc_frame = 7; // HHMM
+     bool assigned_utc_frame_validity = 18;
+     uint32 assigned_slot_number = 8;
+     bool assigned_slot_number_validity = 19;
+     uint32 assigned_slot_count = 9;
+     bool assigned_slot_count_validity = 20;
+     uint32 priority = 10; // 1 = high, 2 = low (default)
+     bool priority_validity = 21;
+     uint32 status = 11; // 0-12
+     bool status_validity = 22;
+}
+
+// $--TSR,c--c,x.x,a,hhmmss.ss,x.x*hh
+// status codes:
+// 0 = successfully blocked prohibited slots
+// 1 = not successful because of internal reservation
+// 2 = not successful because action is not allowed by the Base Station
+//     configuration
+// 3 = not successful because action is for a disabled channel
+// 4 = not successful because of invalid TSA content (e.g. invalid slot
+//     number)
+message Tsr {
+     string station_id = 1; // 15 char uinque id for a station
+     bool station_id_validity = 6;
+     uint32 tsp_seq_msg_id = 2;
+     bool tsp_seq_msg_id_validity = 7;
+     string tsp_channel = 3;
+     bool tsp_channel_validity = 8;
+     double tsp_utc_time = 4;
+     bool tsp_utc_time_vlidity = 9;
+     uint32 status = 5;
+     bool status_validity = 10;
+}
+
+// $--TSA,c--c,x,a,xxxx,x.x,x*hh
+// priority:
+// 0 = cancel the scheduled transmission identified by the Channel
+//     selection, UTC frame hour and minute, and Start slot number.
+// 1 = high priority, should overrule internal Base Station schedule.
+//     It may not interfere with multi-slot transmissions already in
+//     progress.
+// 2 = low priority, will transmit if slot is available
+// 3 to 9 reserved for future use.
+message Tsa {
+     string station_id = 1; // 15 char unique id for a station
+     bool station_id_validity = 7;
+     uint32 vdm_seq_msg_id = 2;
+     bool vdm_seq_msg_id_validity = 8;
+     uint32 vdm_channel = 3;
+     bool vdm_channel_validity = 9;
+     uint32 req_utc_frame = 4; // HHMM
+     bool req_utc_frame_validity = 10;
+     uint32 req_slot_number = 5;
+     bool req_slot_number_validity = 11;
+     uint32 req_priority = 6; // default 2
+     bool req_priority_validity = 12;
+}
+
+// $--TSP,c--c,x.x,a,hhmmss.ss,x.x,x.x,x.x,x.x,x.x,x.x,x.x*hh
+message Tsp {
+     string station_id = 1; // 15 char unique id for a station
+     bool station_id_validity = 12;
+     uint32 seq_msg_id = 2; // 00-99
+     bool seq_msg_id_validity = 13;
+     string channel = 3;
+     bool channel_validity = 14;
+     double utc_time = 4; // HHMMSS.ss
+     bool utc_time_validity = 15;
+     uint32 reference_slot = 5; // slot offset to a reference msg
+     bool reference_slot_validity = 16;
+
+     uint32 blocked_slot_start_1 = 6;
+     bool blocked_slot_start_1_validity = 17;
+     uint32 blocked_slot_count_1 = 7;
+     bool blocked_slot_count_1_validity = 18;
+
+     uint32 blocked_slot_start_2 = 8;
+     bool blocked_slot_start_2_validity = 19;
+     uint32 blocked_slot_count_2 = 9;
+     bool blocked_slot_count_2_validity = 20;
+
+     uint32 blocked_slot_start_3 = 10;
+     bool blocked_slot_start_3_validity = 21;
+     uint32 blocked_slot_count_3 = 11;
+     bool blocked_slot_count_3_validity = 22;
+}
+
+// $--VER,x,x,aa,c--c,c--c,c--c,c--c,c--c,c--c,x*hh
+message Ver {
+     uint32 sentence_count = 1;
+     bool  sentence_count_validity = 11;
+     uint32 sentence_index = 2;
+     bool sentence_index_validity = 12;
+     string device_type = 3; // id manufactured purpose of the dev
+     bool device_type_validity = 13;
+     string vendor_id = 4; // 3-5 char
+     bool vendor_id_validity = 14;
+     string device_id = 5; // 15 char
+     bool device_id_validity = 15;
+     string serial_number = 6; // 32 char
+     bool serial_number_validity = 16;
+     string model_number = 7;
+     bool model_number_validity = 17;
+     string software_version = 8;
+     bool software_version_validity = 18;
+     string hardware_version = 9;
+     bool hardware_version_validity = 19;
+     uint32 seq_msg_id = 10; // 0-9
+     bool seq_msg_id_validity = 20;
+}
+
+// $--ACM,xxxxxxxxx,xxxxxxxxx,xxxx,x,xxxx,x,x,x,x,x,a*hh
+// ACM – AIS Base Station Addressed Channel Management Command
+// Type one:
+//      0 = transmit on channels A and B, receive on channels A and B
+//      1 = transmit on channel A, receive on channels A and B
+//      2 = transmit on channel B, receive on channels A and B
+// Type two:
+//      0 = No broadcast channel preference
+//      1 = broadcast on AIS channel A
+//      2 = broadcast on AIS channel B
+//      3 = broadcast on both AIS channel A and AIS channel B
+message Acm {
+     uint32 destination_1_id = 1; // mmsi
+     bool destination_1_id_validity = 12;
+     uint32 destination_2_id = 2; // mmsi
+     bool destination_2_id_validity = 13;
+     uint32 channel_a_number = 3; // xxxx defines channel A
+     bool channel_a_number_validity = 14;
+     uint32 channel_a_bandwidth = 4; // 0 = see table, 1 = 12.5kHz
+     bool channel_a_bandwidth_validity = 15;
+     uint32 channel_b_number = 5; // xxxx defines channel B
+     bool channel_b_number_validity = 16;
+     uint32 channel_b_bandwidth = 6; // 0 = see table, 1 = 12.5kHz
+     bool channel_b_bandwidth_validity = 17;
+     uint32 transmit = 7; // type one
+     bool transmit_validity = 18;
+     uint32 power = 8; // 0 = high, 1 = low
+     bool power_validity = 19;
+     uint32 station_channel = 9; // type two
+     bool station_channel_validity = 20;
+     uint32 transition_zone_size = 10; // 1 to 8 nautical miles
+     bool transition_zone_size_validity = 21;
+     string status = 11; // R = report, C = configure
+     bool status_validity = 22;
+}
+
+// $--ASN,xxxxxxxxx,x.x,x.x,x,xxxxxxxxx,x.x,x.x,x,x,a*hh
+// ASN –AIS Base Station Broadcast of Assignment Command
+message Asn {
+     uint32 destination_1_id = 1;
+     bool destination_1_id_validity = 11;
+     uint32 reporting_rate_1 = 2; // 0 to 600 in increments of 20
+     bool reporting_rate_1_validity = 12;
+     uint32 slot_assignment_1 = 3;
+     bool slot_assignment_1_validity = 13;
+     uint32 slot_increment_1 = 4;
+     bool slot_increment_1_validity = 14;
+
+     uint32 destination_2_id = 5;
+     bool destination_2_id_validity = 15;
+     uint32 reporting_rate_2 = 6; // 0 to 600 in increments of 20
+     bool reporting_rate_2_validity = 16;
+     uint32 slot_assignment_2 = 7;
+     bool slot_assignment_2_validity = 17;
+     uint32 slot_increment_2 = 8; // 0-6
+     bool slot_increment_2_validity = 18;
+
+     uint32 broadcast_channel = 9; // 0=A/B, 1=A, 2=B
+     bool broadcast_channel_validity = 19;
+     string status = 10; // R = report, C = configure
+     bool status_validity = 20;
+}
+
+//$--AGA,c--c,x.x,xxx,llll.ll,a,yyyyy.yy,a,llll.ll,a,yyyyy.yy,a,xx,x,xx,a*hh
+// AGA – AIS Base Station Broadcast of a Group Assignment Command
+// Station type:
+//      0 = all types of mobiles (default)
+//      1 = Class A mobile station only
+//      2 = all types of Class B mobile stations
+//      3 = SAR airborne mobile station
+//      4 = Class B “SO” mobile stations only
+//      5 = Class B“CS” shipborne mobile station only
+//      6 = Inland waterways
+//      7-9 = for regional use
+//      10-15 = for future use
+// Report interval:
+//      0 = as given by the autonomous mode
+//      1 = 10 min
+//      2 = 6 min
+//      3 = 3 min
+//      4 = 1 min
+//      5 = 30 s
+//      6 = 15 s
+//      7 = 10 s
+//      8 = 5 s
+//      9 = next shorter reporting interval
+//      10 = next longer reporting interval
+//      11 = 2 s (not applicable to class B CS)
+//      12-15 = reserved for future use
+// Tx Rx mode:
+//      0 = transmit on channels A and B, receive on channels A and B
+//      1 = transmit on channel A, receive on channels A and B
+//      2 = transmit on channel B, receive on channels A and B
+//      3 = reserved for future use
+message Aga {
+     string station_id = 1;
+     bool station_id_validity = 11;
+     uint32 station_type = 2; // 0-15, station type
+     bool station_type_validity = 12;
+     double latitude = 3; // xxxx.xx
+     bool latitude_validity = 13;
+     string latitude_direction = 4; // N/S
+     bool latitude_direction_validity = 14;
+     double longitude = 5; // xxxxx.xx
+     bool longitude_validity = 15;
+     string longitude_direction = 6; // E/W
+     bool longitude_direction_validity = 16;
+     uint32 report_interval = 7; // 0-15
+     bool report_interval_validity = 17; 
+     uint32 tx_rx_mode = 8; // 0-3
+     bool tx_rx_mode_validity = 18;
+     uint32 quite_time = 9; // 0-15
+     bool quite_time_validity = 19;
+     string status = 10; // R = report, C = configure
+     bool status_validity = 20;
+}
+
+// $--ACA,x,llll.ll,a,yyyyy.yy,a,llll.ll,a,yyyyy.yy,a,x,xxxx,x,xxxx,x,x,x,a,x,hhmmss.ss*hh
+// ACA – AIS Regional Channel Assignment Message
+// tx rx mode:
+//      0, transmit on channels A and B, receive on channels A and B
+//      1, transmit on channel A, receive on channels A and B
+//      2, transmit on channel B, receive on channels A and B
+//      3, do not transmit, receive on channels A and B
+//      4, do not transmit, receive on channel A
+//      5, do not transmit, receive on channel B
+message Aca {
+     uint32 seq_msg_id = 1; // 0-9
+     bool seq_msg_id_validity = 20;
+
+     double region_ne_lat = 2; // xxxx.xx
+     bool region_ne_lat_validity = 21;
+
+     string region_ne_lat_dir = 3; // N/S
+     bool region_ne_lat_dir_validity = 22;
+     double region_ne_lon = 4; // xxxxx.xx
+     bool region_ne_lon_validity = 23;
+     string region_ne_lon_dir = 5; // E/W
+     bool region_ne_lon_dir_validity = 24;
+
+     double region_sw_lat = 6; // xxxx.xx
+     bool region_sw_lat_validity = 25;
+     string region_sw_lat_dir = 7; // N/S
+     bool region_sw_lat_dir_validity = 26;
+     double region_sw_lon = 8; // xxxxx.xx
+     bool region_sw_lon_validity = 27;
+     string region_sw_lon_dir = 9; // E/W
+     bool region_sw_lon_dir_validity = 28;
+
+     uint32 transition_zone_size = 10; // 1-8 nautical miles
+     bool transition_zone_size_validity = 29;
+
+     uint32 channel_a_number = 11; // xxxx defines channel A
+     bool channel_a_number_validity = 30;
+     uint32 channel_a_bandwidth = 12; // 0 = see table, 1 = 12.5kHz
+     bool channel_a_bandwidth_validity = 31;
+     uint32 channel_b_number = 13; // xxxx defines channel B
+     bool channel_b_number_validity = 32;
+     uint32 channel_b_bandwidth = 14; // 0 = see table, 1 = 12.5kHz
+     bool channel_b_bandwidth_validity = 33;
+
+     uint32 tx_rx_mode = 15; // 0-5
+     bool tx_rx_mode_validity = 34;
+     uint32 power = 16; // 0 = high, 1 = low
+     bool power_validity = 35;
+     string info_source = 17; // A,B,C,D,M,null
+     bool info_source_validity = 36;
+
+     uint32 in_use_flag = 18; // 1 = in use , 0 = not in use
+     bool in_use_flag_validity = 37;
+     double in_use_utc_time = 19;
+     bool in_use_utc_time_validity = 38;
+}
+
+// $--BCG,c--c, xxxx,xxxx,xxxx,xxxx,x,x,x,x,a,a,x.x,aa,a*hh
+// BCG – Base Station Configuration, General Command
+// power type:
+//      0 = high power (Nominal 12,5 W)
+//      1 = low power (Nominal 2 W)
+//      2 to 8 reserved for future use
+//      9 = transmission disabled (zero W), default.
+// vdl retries:
+//      0 = do not automatically re-broadcast addressed messages.
+//      1 = limit automatic re-broadcast to one retry
+//      2 = limit automatic re-broadcast to two retries
+//      3 = permitted to use the maximum number of 3 retries (default)
+// utc source selection:
+//      E = external UTC source
+//      I = internal UTC source
+//      X = external UTC source with fallback to internal UTC source
+//      Y = internal UTC source with fallback to external UTC source,
+//          if available
+message Bcg {
+     string station_id = 1;
+     bool station_id_validity = 15;
+     uint32 rx_channel_a_number = 2;
+     bool rx_channel_a_number_validity = 16;
+     uint32 rx_channel_b_number = 3;
+     bool rx_channel_b_number_validity = 17;
+     uint32 tx_channel_a_number = 4;
+     bool tx_channel_a_number_validity = 18;
+     uint32 tx_channel_b_number = 5;
+     bool tx_channel_b_number_validity = 19;
+     uint32 power_a = 6; // 0-9
+     bool power_a_validity = 20;
+     uint32 power_b = 7; // 0-9
+     bool power_b_validity = 21;
+     uint32 vdl_msg_retries = 8; // 0-3
+     bool vdl_msg_retries_validity = 22;
+     uint32 vdl_msg_repeat_indicator = 9;
+     bool vdl_msg_repeat_indicator_validity  = 23;
+     uint32 ratdma_access = 10; // 0 = off, 1 = on
+     bool ratdma_access_validity = 24;
+     string utc_source_selection = 11;
+     bool utc_source_selection_validity = 25;
+     uint32 ads_interval = 12; // in seconds, 1 to 3600
+     bool ads_interval_validity = 26;
+     string assigned_talker = 13; // cc, value is U0-U9
+     bool assigned_talker_validity = 27;
+     string status = 14; // R = report, C = configure
+     bool status_validity = 28;
+}
+
+// $--BCL, c--c,x,llll.ll,a,yyyyy.yy,a,x,c--c,a*hh
+// BCL – Base Station Configuration, Location Command
+// position source:
+//      0 = surveyed position (should always be used for Fixed AIS
+//          Base Station)
+//      1 = internal EPFD in use
+//      2 = external EPFD in use
+//      3 = internal EPFD in use with automatic fall back to
+//          surveyed position
+//      4 = internal EPFD in use with automatic fall back to
+//          external EPFD upon failure of internal EPFD
+//      5 = external EPFD in use with automatic fall back to
+//          surveyed position
+//      6 = external EPFD in use with automatic fall back to
+//          internal position source upon failure of external
+//          position source
+message Bcl {
+     string station_id = 1;
+     bool station_id_validity = 9;
+     uint32 position_source = 2; // 0 to 6
+     bool position_source_validity = 10;
+     double latitude = 3; // xxxx.xx
+     bool latitude_validity = 11;
+     string latitude_direction = 4; // N/S
+     bool latitude_direction_validity = 12;
+     double longitude = 5; // xxxxx.xx
+     bool longitude_validity = 13;
+     string longitude_direction = 6; // E/W
+     bool longitude_direction_validity = 14;
+     string name = 7; // 20 char, name as from message 24A
+     bool name_validity = 15;
+     string status = 8; // R = report, C = configure
+     bool status_validity = 16;
+}
+
+// $--RST,c--c,x,x,a*hh
+// RST – Equipment Reset Command
+// reset command:
+//      1 = This commands the equipment to restart operation using the
+//          current values for all configurable settings.
+//      2 = This commands the equipment to reset all configurable
+//          settings to the default factory values.
+// reset status:
+//      1 = equipment restart using the current values for all
+//          configurable settings.
+//      2 = equipment reset all configurable settings to the default
+//          factory values.
+//      3 = unexpected restart using the current values for all
+//          configurable settings (no RST command).
+//      4 = unexpected reset all configurable settings to the default
+//          factory values (no RST command).
+//      5 to 9 reserved for future use.
+message Rst {
+     string station_id = 1;
+     bool station_id_validity = 5;
+     uint32 reset_command = 2;
+     bool reset_command_validity = 6;
+     uint32 reset_status = 3;
+     bool reset_status_validity = 7;
+     string status = 4; // R = report, C = configure
+     bool status_validity = 8;
+}
+
+// $--DLM,x,a,a,x.x,x,x,x.x,a,x.x,x,x,x.x,a,x.x,x,x,x.x,a,x.x,x,x,x.x,a*hh
+// DLM – Data Link Management Slot Allocations for Base Station Command
+message Dlm {
+     uint32 record_index = 1; // 0 to 9
+     bool record_index_validity = 24;
+     string channel = 2; // A or B
+     bool channel_validity = 25;
+
+     string reservation_ownership_1 = 3; // L=local,R=remote,C=clear
+     bool reservation_ownership_1_validity = 26;
+     uint32 reservation_start_slot_1 = 4; //  0 to 2249
+     bool reservation_start_slot_1_validity = 27;
+     uint32 reservation_count_1 = 5; // 1 to 5
+     bool reservation_count_1_validity = 28;
+     uint32 reservation_timeout_1 = 6; // 0 to 7
+     bool reservation_timeout_1_validity = 29;
+     uint32 reservation_increment_1 = 7; // 0 to 1125
+     bool reservation_increment_1_validity = 30;
+
+     string reservation_ownership_2 = 8; // L=local,R=remote,C=clear
+     bool reservation_ownership_2_validity = 31;
+     uint32 reservation_start_slot_2 = 9; //  0 to 2249
+     bool reservation_start_slot_2_validity = 32;
+     uint32 reservation_count_2 = 10; // 1 to 5
+     bool reservation_count_2_validity = 33;
+     uint32 reservation_timeout_2 = 11; // 0 to 7
+     bool reservation_timeout_2_validity = 34;
+     uint32 reservation_increment_2 = 12; // 0 to 1125
+     bool reservation_increment_2_validity = 35;
+
+     string reservation_ownership_3 = 13; //L=local,R=remote,C=clear
+     bool reservation_ownership_3_validity = 36;
+     uint32 reservation_start_slot_3 = 14; //  0 to 2249
+     bool reservation_start_slot_3_validity = 37;
+     uint32 reservation_count_3 = 15; // 1 to 5
+     bool reservation_count_3_validity = 38;
+     uint32 reservation_timeout_3 = 16; // 0 to 7
+     bool reservation_timeout_3_validity = 39;
+     uint32 reservation_increment_3 = 17; // 0 to 1125
+     bool reservation_increment_3_validity = 40;
+
+     string reservation_ownership_4 = 18; //L=local,R=remote,C=clear
+     bool reservation_ownership_4_validity = 41;
+     uint32 reservation_start_slot_4 = 19; //  0 to 2249
+     bool reservation_start_slot_4_validity = 42;
+     uint32 reservation_count_4 = 20; // 1 to 5
+     bool reservation_count_4_validity = 43;
+     uint32 reservation_timeout_4 = 21; // 0 to 7
+     bool reservation_timeout_4_validity = 44;
+     uint32 reservation_increment_4 = 22; // 0 to 1125
+     bool reservation_increment_4_validity = 45;
+
+     string status = 23; // R = report, C = configure
+     bool status_validity = 46;
+}
+
+// $--ECB,c--c,x.x,x.x,x.x,x,x,x.x,x.x,x,x,a*hh
+// ECB – Configure Broadcast Schedules for Base Station Messages, Command
+message Ecb {
+     string station_id = 1;
+     bool station_id_validity = 12;
+     uint32 message_id = 2;
+     bool message_id_validity = 13;
+
+     double reference_utc_minute_channel_a = 3; // TODO type x.x ?
+     bool reference_utc_minute_channel_a_validity = 14;
+     int32 reference_slot_channel_a = 4; // -1 to 749
+     bool reference_slot_channel_a_validity = 15;
+     uint32 slot_interval_channel_a = 5;
+     bool slot_interval_channel_a_validity = 16;
+     uint32 slot_count_channel_a = 6; // for message 17 only
+     bool slot_count_channel_a_validity = 17;
+
+     double reference_utc_minute_channel_b = 7;
+     bool reference_utc_minute_channel_b_validity = 18;
+     int32 reference_slot_channel_b = 8; // -1 to 749
+     bool reference_slot_channel_b_validity = 19;
+     uint32 slot_interval_channel_b = 9;
+     bool slot_interval_channel_b_validity = 20;
+     uint32 slot_count_channel_b = 10; // for message 17 only
+     bool slot_count_channel_b_validity = 21;
+
+     string status = 11; // R = report, C = configure
+     bool status_validity = 22;
+}
+
+// $--SID,c--c,c--c,xxxxxxxxx,xxxxxxxxx,a*hh
+// SID – Set an Equipment’s IDentification and Command
+message Sid {
+     string station_id = 1;
+     bool station_id_validity = 6;
+     string new_station_id = 2;
+     bool new_station_id_validity = 7;
+     uint32 mmsi = 3;
+     bool mmsi_validity = 8;
+     uint32 new_mmsi = 4;
+     bool new_mmsi_validity = 9;
+     string status = 5; // R = report, C = configure
+     bool status_validity = 10;
+}
+
+// Radar NMEA Messages
+
+//$PRAYQR,%d*%x<CR><LF>
+// CQRR - Command Query Radar RPM
+message Cqrr {
+     uint32 reserved_for_future_releases = 1;
+     bool reserved_for_future_releases_validity = 2;
+}
+
+//$PRAYTC,%d,%d,%f,%d,%d,%d,%d*%x<CR><LF> 
+// SCPA - Set Current Parameters
+message Scpa{
+     uint32 current_profile = 1;
+     bool current_profile_validity = 8;
+     uint32 classifier_state = 2;
+     bool classifier_state_validity = 9;
+     double classifier_threshold = 3;
+     bool classifier_threshold_validity = 10;
+     int32 min_dir_of_interest_in_degrees = 4;
+     bool min_dir_of_interest_in_degrees_validity = 11;
+     int32 max_dir_of_interest_in_degrees = 5;
+     bool max_dir_of_interest_in_degrees_validity = 12;
+     uint32 min_velocity_in_knots = 6;
+     bool min_velocity_in_knots_validity = 13;
+     uint32 max_velocity_in_knots = 7;
+     bool max_velocity_in_knots_validity = 14;
+}
+
+//$PRAYPD,%d,%d,c--c*x<CR><LF>
+// DLPS - Data Load Profile Strings
+message Dlps {
+     uint32 number_of_profiles = 1;
+     uint32 profile_number = 2;
+     string profile_description = 3;
+}
+
+//$PRAYRPC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d*%x<CR><LF>
+// DRPC - Data Reset Profile Chain
+message Drpc {
+     uint32 reserved_for_future_use = 1;
+     bool reserved_for_future_use_validity = 18;
+     uint32 profile_0_flag = 2;
+     bool profile_0_flag_validity = 19;
+     uint32 profile_1_flag = 3;
+     bool profile_1_flag_validity = 20;
+     uint32 profile_2_flag = 4;
+     bool profile_2_flag_validity = 21;
+     uint32 profile_3_flag = 5;
+     bool profile_3_flag_validity = 22;
+     uint32 profile_4_flag = 6;
+     bool profile_4_flag_validity = 23;
+     uint32 profile_5_flag = 7;
+     bool profile_5_flag_validity = 24;
+     uint32 profile_6_flag = 8;
+     bool profile_6_flag_validity = 25;
+     uint32 profile_7_flag = 9;
+     bool profile_7_flag_validity = 26;
+     uint32 profile_8_flag = 10;
+     bool profile_8_flag_validity = 27;
+     uint32 profile_9_flag = 11;
+     bool profile_9_flag_validity = 28;
+     uint32 profile_10_flag = 12;
+     bool profile_10_flag_validity = 29;
+     uint32 profile_11_flag = 13;
+     bool profile_11_flag_validity = 30;
+     uint32 profile_12_flag = 14;
+     bool profile_12_flag_validity = 31;
+     uint32 profile_13_flag = 15;
+     bool profile_13_flag_validity = 32;
+     uint32 profile_14_flag = 16;
+     bool profile_14_flag_validity = 33;
+     uint32 profile_15_flag = 17;
+     bool profile_15_flag_validity = 34;
+}
+
+//$PRAYPR,1,1,%d,1*%x<CR><LF>
+// SCPR - Set Current Parameters
+message Scpr {
+     uint32 unused_backward_compatibility_field_number_1 = 1;
+     bool unused_backward_compatibility_field_number_1_validity = 5;
+     uint32 unused_backward_compatibility_field_number_2 = 2;
+     bool unused_backward_compatibility_field_number_2_validity = 6;
+     uint32 current_profile_number = 3;
+     bool current_profile_number_validity = 7;
+     uint32 unused_backward_compatibility_field_number_4 = 4;
+     bool unused_backward_compatibility_field_number_4_validity = 8;
+}
+
+// $PRAYDT,%d*%x<CR><LF>
+// CDT - Command Drop Track
+message Cdt {
+     uint32 track_id = 1;
+     bool track_id_validity = 2;
+}
+
+// $SHUTDOWN,%d*%x<CR><LF>
+// CSDM - Command Shutdown MSTT
+message Csdm {
+     uint32 reboot_flag = 1;
+     bool reboot_flag_validity = 2;
+}
+
+// $PFA,%g*%x<CR><LF>
+// CPFAC - Command PFA Change
+message Cpfac {
+     double pfa_change_factor = 1;
+     bool pfa_change_factor_validity = 3;
+}
+
+// $PRAYPF,%f*%x<CR><LF>
+// CPFC - Command PF Change
+message Cpfc {
+     double pf_change_factor = 1;
+     bool pf_change_factor_validity = 2;
+}
+
+// $PRAYSU,%u,%s*%x<CR><LF>
+// RS - Response String
+message Rs {
+     uint32 response_type_id = 1;
+     bool response_type_id_validity = 3;
+     string response_str = 2;
+     bool response_str_validity = 4;
+
+}
+
+// $PRAYRR,%d*%x<CR><LF>
+// CRSC - Command Radar State Control 
+message Crsc {
+     uint32 nature_of_command_identifier = 1;
+     bool nature_of_command_identifier_validity = 2;
+}
+
+// PRAYIT,%d,%d,%d,%f,%f*%x<CR><LF>
+// CCT - Command Create Track
+message Cct {
+     uint32 utc_timestamp = 1;
+     bool utc_timestamp_validity = 6;
+     int32 track_location_w_to_e_in_m = 2;
+     bool track_location_w_to_e_in_m_validity = 7;
+     int32 track_location_n_to_s_in_m = 3;
+     bool track_location_n_to_s_in_m_validity = 8;
+     double track_location_w_to_e_in_deg = 4;
+     bool track_location_w_to_e_in_deg_validity = 9;
+     double track_location_n_to_s_in_deg = 5;
+     bool track_location_n_to_s_in_deg_validity = 10;
+} 
+
+// Based on $PRAYST,%d,%d,%d,%f,%f,%d,%d,%f,%d*%x<CR><LF>
+// CST - Command Select Track
+message Cst {
+     uint32 time_in_sec_till_new_pfa_persists = 1;
+     bool time_in_sec_till_new_pfa_persists_validity = 10;
+     int32 center_of_pfa_w_to_e_in_m = 2;
+     bool center_of_pfa_w_to_e_in_m_validity = 11;
+     int32 center_of_pfa_n_to_s_in_m = 3;
+     bool center_of_pfa_n_to_s_in_m_validity = 12;
+     double track_location_w_to_e_in_deg = 4;
+     bool track_location_w_to_e_in_deg_validity = 13;
+     double track_location_n_to_s_in_deg = 5;
+     bool track_location_n_to_s_in_deg_validity = 14;
+     uint32 Hrzl_dim_of_region_in_m = 6;
+     bool Hrzl_dim_of_region_in_m_validity = 15;
+     uint32 Vrtl_dim_of_region_in_m = 7;
+     bool Vrtl_dim_of_region_in_m_validity = 16;
+     double pfa_multiplying_factor = 8;
+     bool pfa_multiplying_factor_validity = 17;
+     uint32 region_shape_flag = 9;
+     bool region_shape_flag_validity = 18;
+}
+
+// Based on $PRAYCT,%d,%d,%d,%d,%f,%f*%x<CR><LF>
+// CTC - Command Correct Track
+message Ctc {
+     uint32 time_in_utc_format = 1;
+     bool time_in_utc_format_validity = 7;
+     uint32 track_id = 2;
+     bool track_id_validity = 8;
+     int32 track_position_offset_w_to_e_in_m = 3;
+     bool track_position_offset_w_to_e_in_m_validity = 9;
+     int32 track_position_offset_n_to_s_in_m = 4;
+     bool track_position_offset_n_to_s_in_m_validity = 10;
+     double track_location_w_to_e_in_deg = 5;
+     bool track_location_w_to_e_in_deg_validity = 11;
+     double track_location_n_to_s_in_deg = 6; 
+     bool track_location_n_to_s_in_deg_validity = 12;   
+}
+
+// MSTT Track Related
+
+// Based on $PRAYTS,ttttt, s*cc
+// TS - Track Size
+message Ts {
+     uint32 track_id = 1;
+     bool track_id_validity = 3;
+     uint32 track_size = 2;
+     bool track_size_validity = 4;
+}
+
+// Based on $PRAYCVECEF,ttttt, mm, c.ccc, Ssss, X, XVx, XY, XVy, XZ, XVz, VxVx, VxY, VxVy, VxZ, VxVz, Y, YVy, YZ, YVz, VyVy, VyZ, VyVz, Z, ZVz, VzVz, spare*cc
+// ECEF - Track Covariances
+message Ecef {
+     uint32 track_id = 1;
+     bool track_id_validity = 27;
+     uint32 mstt_id = 2;
+     bool mstt_id_validity = 28;
+     double track_confidence = 3;
+     bool track_confidence_validity = 29;
+     string sensor_names = 4;
+     bool sensor_names_validity = 30;
+     double cv_x = 5;
+     bool cv_x_validity = 31;
+     double cv_xvx = 6;
+     bool cv_xvx_validity = 32;
+     double cv_xy = 7;
+     bool cv_xy_validity = 33;
+     double cv_xvy = 8;
+     bool cv_xvy_validity = 34;
+     double cv_xz = 9;
+     bool cv_xz_validity = 35;
+     double cv_xvz = 10;
+     bool cv_xvz_validity = 36;
+     double cv_vxvx = 11;
+     bool cv_vxvx_validity = 37;
+     double cv_vxy = 12;
+     bool cv_vxy_validity = 38;
+     double cv_vxvy = 13;
+     bool cv_vxvy_validity = 39;
+     double cv_vxz = 14;
+     bool cv_vxz_validity = 40;
+     double cv_vxvz = 15;
+     bool cv_vxvz_validity = 41;
+     double cv_y = 16;
+     bool cv_y_validity = 42;
+     double cv_yvy = 17;
+     bool cv_yvy_validity = 43;
+     double cv_yz = 18;
+     bool cv_yz_validity = 44;
+     double cv_yvz = 19;
+     bool cv_yvz_validity = 45;
+     double cv_vyvy = 20;
+     bool cv_vyvy_validity = 46;
+     double cv_vyz = 21;
+     bool cv_vyz_validity = 47;
+     double cv_vyvz = 22;
+     bool cv_vyvz_validity = 48;
+     double cv_z = 23;
+     bool cv_z_validity = 49;
+     double cv_zvz = 24;
+     bool cv_zvz_validity = 50;
+     double cv_vzvz = 25;
+     bool cv_vzvz_validity = 51;
+     bytes spare = 26;
+     bool spare_validity = 52;
+}
+
+// Based on $PRAYRS,%d*x<CR><LF>
+// RS - Broadcast string
+message Brs {
+     uint32 type_id = 1;
+     bool type_id_validity = 2;
+}
+
+

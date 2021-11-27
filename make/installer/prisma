@@ -1,0 +1,3 @@
+Package: wkhtmltox xvfb
+Pin: origin prisma-rcc
+Pin-Priority: 900

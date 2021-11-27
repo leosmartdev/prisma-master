@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "prisma/tms/common.proto";
+import "prisma/tms/moc/fleet.proto";
+
+message Site {
+    string id = 1;
+    uint32 siteId = 2; // tgwad num value
+    string type = 3;
+    string name = 4;
+    string description = 5;
+    string address = 6;
+    string country = 7; // 3 letter ISO country code
+    Point point = 8;
+    ConnectionStatus connectionStatus = 9;
+    string parentId = 10;
+    string incidentIdPrefix = 11;
+    string cscode = 12; // Cospas/Sarsat code
+    string csname = 13; // C/S name
+    repeated Device devices = 20;
+    Capability capability = 30;
+    enum ConnectionStatus {
+        nonstate = 0; // not used, zero is considered not set
+        Unknown = 1;
+        Ok = 10;
+        Bad = 20;
+    }
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+    }
+    message Capability {
+        bool inputIncident = 1;
+        bool outputIncident = 2;
+    }
+}

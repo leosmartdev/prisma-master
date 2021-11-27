@@ -1,0 +1,10 @@
+syntax="proto3";
+
+package prisma.tms.moc;
+
+message View {
+    enum Action {
+        CREATE = 0;
+        STREAM = 1;
+    }
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="no"?>
+<TracksDataInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="VTMISTracksData.xsd">
+  <VTSCenter>Ras Laffan</VTSCenter>
+  <FileUpdateTime>2018-09-11T22:49:15.458Z</FileUpdateTime>
+  <AisTracks>
+    <AisTrack>
+      <MMSI>576254000</MMSI>
+      <Timestamp>2018-09-11T22:44:50.000Z</Timestamp>
+      <TypeOfShip>52</TypeOfShip>
+      <NameOfShip>KIRKCONNELL TIDE    </NameOfShip>
+      <Callsign>YJVV6  </Callsign>
+      <NavStatus>1</NavStatus>
+      <Speed>0.05144</Speed>
+      <Course>241.7</Course>
+      <Heading>344.0</Heading>
+      <Long>50.18861</Long>
+      <Lat>26.62047</Lat>
+      <Draught>4.8</Draught>
+      <ETA>613696</ETA>
+      <Size>23265924</Size>
+      <IMONumber>9582180</IMONumber>
+      <Destination>RASTANURA FRAIGHTER </Destination>
+    </AisTrack>
+  </AisTracks>
+  <TrackerTracks/>
+</TracksDataInfo>
+

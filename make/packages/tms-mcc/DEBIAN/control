@@ -1,0 +1,8 @@
+Package: tms-mcc
+Version: @VERSION@-@DEBIAN_REVISION@.@TIMESTAMP@.git@COMMIT@
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: tms (= @VERSION@-@DEBIAN_REVISION@.@TIMESTAMP@.git@COMMIT@), vsftpd, apache2-utils, libpam-pwdfile
+Maintainer: Orolia
+Description: TMS - MCC

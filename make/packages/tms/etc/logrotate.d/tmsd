@@ -1,0 +1,14 @@
+su root syslog
+
+/var/log/tmsd.log
+{
+	rotate 7
+	daily
+	missingok
+	notifempty
+	delaycompress
+	compress
+	postrotate
+		reload rsyslog >/dev/null 2>&1 || true
+	endscript
+}

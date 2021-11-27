@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+message Config {
+    enum Action {
+        GET = 0;
+        UPDATE = 1;
+    }
+}

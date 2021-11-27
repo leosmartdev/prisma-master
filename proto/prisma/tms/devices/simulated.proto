@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package prisma.tms.devices;
+
+message FakeVideo {
+    // This is a message which just contains a bunch of dummy data, used to
+    // simulated a realtime video feed from a CSS to an HQ
+    uint64 seq_no = 1;
+    uint64 video_source = 2;
+    bytes frame_data = 3;
+}

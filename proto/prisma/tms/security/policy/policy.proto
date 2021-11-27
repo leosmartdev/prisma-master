@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package prisma.tms.security.policy;
+
+import "prisma/tms/security/policy/audit.proto";
+import "prisma/tms/security/policy/password.proto";
+import "prisma/tms/security/policy/profile.proto";
+import "prisma/tms/security/policy/role.proto";
+import "prisma/tms/security/policy/session.proto";
+import "prisma/tms/security/policy/user.proto";
+
+message Policy {
+    string description = 10;
+    AuditPolicy audit = 11;
+    PasswordPolicy password = 12;
+    ProfilePolicy profile = 13;
+    RolePolicy role = 14;
+    SessionPolicy session = 15;
+    UserPolicy user = 16;
+    enum Action {
+        READ = 0;
+        UPDATE = 1;
+    }
+    enum State {
+        // not used, zero is considered not set
+        nonstate = 0;
+        Active = 1;
+        Archived = 3;
+    }
+}

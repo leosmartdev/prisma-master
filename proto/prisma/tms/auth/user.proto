@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package prisma.tms.auth;
+
+message User {
+    string id = 1;
+
+    string user_name = 2;
+
+    // Auth request will pass password, and the response after login will include session_token
+    oneof token {               
+        string password = 3;
+        string session_token = 4;
+    }
+    string salt = 5;
+
+    string last_name = 6;
+    string first_name = 7;
+    string comments = 8;
+
+    // The name of the role, so that the db will not have the entire structure for every single user
+    string role_name = 10;    
+
+    // Boolean indicating whether the user object is  marked as deleted or not.
+    // The objects are not deleted permanantly from the db to avoid problems with auditing.
+    bool deleted = 15;  
+}
+

@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "google/protobuf/timestamp.proto";
+
+message Sit915 {
+  string id = 1;
+  string remotesite_id = 2;
+  int32 transmission_num = 3;
+  int32 retransmission_num = 4;
+  string narrative = 5;
+  string status = 6;
+  string comm_link_type = 7;
+  google.protobuf.Timestamp timestamp = 8;
+  string message_body = 9;
+  bool dismiss = 10;
+  string error_detail = 11;
+
+  enum Action {
+    CREATE = 0;
+    READ = 1;
+    UPDATE = 2;
+  }
+
+  enum Status {
+    PENDING = 0;
+    SENT = 1;
+    FAILED = 2;
+  }
+
+  enum CommLinkType {
+    SFTP = 0;
+    FTP = 1;
+  }
+}

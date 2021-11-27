@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<topMessage>
+    <header dest="2770" orig="2570" number="14063" date="2014-10-14T13:46:17Z" />
+    <message>
+        <resolvedAlertMessage>
+            <header>
+                <siteId>41102</siteId>
+                <beacon>202B89B81600000</beacon>
+            </header>
+            <composite> 
+                <location latitude="10.7" longitude="10" />
+                <duration>PT1155M</duration>
+            </composite>
+        </resolvedAlertMessage>
+    </message>
+</topMessage>

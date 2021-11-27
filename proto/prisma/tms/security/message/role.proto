@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package prisma.tms.security.message;
+
+enum RoleId {
+    Administrator = 0;
+    UserManager = 1;
+    FleetManager = 2;
+    StandardUser = 4;
+    IncidentManager = 5;
+    RuleCreator = 6;
+    RuleManager = 7;
+    RestrictedUser = 8;
+}

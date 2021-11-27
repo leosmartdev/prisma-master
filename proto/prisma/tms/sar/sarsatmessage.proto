@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package prisma.tms.sar;
+
+import "prisma/tms/sar/sarsatnotification.proto";
+import "google/protobuf/timestamp.proto";
+
+
+/* SARSAT Message object used for MCC to RCC communication. Usually this will be a SIT message or a McMurdo XML message.
+ */
+message SarsatMessage {
+
+    int32 message_number = 2;                   // The number of the SIT message
+
+    MessageType message_type = 3;               // The type of the message 
+
+    google.protobuf.Timestamp message_time = 4; // The time message was receieved (for incoming) or sent (for outgoing)
+
+    repeated string mobile_ids = 7;               // A list of Mobile IDs the SIT message contains information about
+
+    string message_body = 8;             // The body of the message
+
+    string local_name = 9;               // The name of the local RCC
+
+    string protocol = 10;                // The communication protocol over which the message was received/sent
+
+    bool received = 11;               // If true, the message was receieved, otherwise sent from the local RCC 
+
+    string remote_name = 12;              // The name of the destination from which the message is received/to which the message is sent
+
+    DestinationType remote_type = 13;    // The type of the destination from which the message is received/to which the message is sent
+
+    SarsatAlert sarsat_alert = 14;
+
+    FreeForm  free_form_message = 15;
+
+    string narrative_text = 16;          // The narrative text from the body of the message
+
+    // Enum for the type of destinations expected for remote destination
+    enum DestinationType {
+        MCC = 0;
+        RCC = 1;
+        SPOC = 2;
+    }
+
+    // Enum for the type of destinations expected for remote destination
+    enum MessageType {
+        MCM_XML = 0;
+        SIT_915 = 1;
+        SIT_185 = 2;
+        UNKNOWN = 3;
+    }
+
+    enum Action {
+        READ = 0;
+    }
+}
+
+message FreeForm {
+    string subject = 1;
+    string body = 2;
+}

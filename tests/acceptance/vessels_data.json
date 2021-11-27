@@ -1,0 +1,113 @@
+{
+  "time_config": {
+    "sleep_get_info_position": 1
+  },
+  "sarsat": {
+    "time_cs_located_sec": 1,
+    "time_cs_confirmed_sec": 2,
+    "time_recreate_sec": 2,
+    "zone": {
+      "top": 1,
+      "bottom": 0,
+      "left": 0,
+      "right": 1
+    }
+  },
+  "objects": [
+    {
+      "device": "omnicom",
+      "imei": "300234010030450",
+      "imei_g3":"999234010030461",
+      "omnicom_id": 10,
+      "pos": [
+        {
+          "latitude": 0,
+          "longitude": 0,
+          "speed": 1
+        },
+        {
+          "latitude": 35.17,
+          "longitude": -52.11,
+          "speed": 1
+        }
+      ],
+      "reportperiod": 4
+    },
+    {
+      "device": "omnicom",
+      "imei": "999234010030455",
+      "imei_g3":"999234010030465",
+      "omnicom_id": 11,
+      "pos": [
+        {
+          "latitude": 0.976958,
+          "longitude": 104.366925,
+          "speed": 1
+        },
+        {
+          "latitude": 0.970855,
+          "longitude": 103.957563,
+          "speed": 1
+        }
+      ],
+      "reportperiod": 1
+    },
+    {
+      "device": "omnicom",
+      "imei": "555234010030456",
+      "imei_g3":"999234010030477",
+      "omnicom_id": 12,
+      "pos": [
+        {
+          "latitude": 0.891826,
+          "longitude": 104.0442829,
+          "speed": 1
+        },
+        {
+          "latitude": 0.644656,
+          "longitude": 104.084028,
+          "speed": 1
+        }
+      ],
+      "reportperiod": 1
+    },
+    {
+      "device": "omnicom",
+      "imei": "333234010030457",
+      "imei_g3":"999234010030488",
+      "omnicom_id": 13,
+      "pos": [
+        {
+          "latitude": 1.171931,
+          "longitude": 104.141706,
+          "speed": 1
+        },
+        {
+          "latitude": 1.174677,
+          "longitude": 104.303754,
+          "speed": 1
+        }
+      ],
+      "reportperiod": 1
+    },
+    {
+      "device": "omnicom",
+      "imei": "444234010030458",
+      "imei_g3":"999234010030499",
+      "omnicom_id": 14,
+      "pos": [
+        {
+          "latitude": 0.768242,
+          "longitude": 103.965925,
+          "speed": 1
+        },
+        {
+          "latitude": 0.625431,
+          "longitude": 104.070295,
+          "speed": 1
+        }
+      ],
+      "reportperiod": 1
+    }
+  ]
+}

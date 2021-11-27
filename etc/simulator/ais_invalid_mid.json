@@ -1,0 +1,12 @@
+{
+  "device": "ais",
+  "mmsi": 119000000,
+  "destination": "NULL ISLAND",
+  "name": "INVALID MID",
+  "eta": "02101504",
+  "type": 58,
+  "pos": [{
+    "latitude": 1,
+    "longitude": 1
+  }]
+}

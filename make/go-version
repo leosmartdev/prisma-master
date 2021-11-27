@@ -1,0 +1,22 @@
+#!/bin/bash
+
+BASEDIR=$(dirname "$0")/..
+
+# If the current HEAD has a tag already, use that version, otherwise, use the VERSION.txt
+# in the root directory.
+TAG_VERSION=$(git tag --points-at HEAD | tr -d v)
+FILE_VERSION=$(cat $BASEDIR/VERSION.txt)
+
+COMMIT=$(git rev-parse --short=8 HEAD)
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+VERSION=$([[ ! -z "$TAG_VERSION" ]] && echo $TAG_VERSION || echo $FILE_VERSION)
+TEMPLATE=$BASEDIR/tms/libmain/version.template
+FILE=$BASEDIR/tms/libmain/version.go
+
+cp $TEMPLATE $FILE
+
+echo $COMMIT
+echo $VERSION
+
+sed -i "s/@VERSION@/$VERSION git$COMMIT/g" $FILE
+sed -i "s/@TIMESTAMP@/$TIMESTAMP/g" $FILE

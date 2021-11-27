@@ -1,0 +1,37 @@
+*.pb.go
+*~
+.vagrant
+vendor
+build
+dist
+*.mo
+.DS_Store
+cucumber.html
+.idea
+*.pyc
+.testCoverageSummary.txt
+.testCoverage.txt
+.cover.html
+.cover.out
+default:
+ubuntu-xenial-16.04-cloudimg-console.log
+1
+release
+*.log
+
+# Ignore built proto
+tms/cmd/tools/tdemo/prisma
+tests/acceptance/prisma
+
+# Ignore built daemons
+tms/cmd/daemons/tanalyzed/tanalyzed
+tms/cmd/daemons/tspiderd/tspiderd
+tms/cmd/daemons/twebd/twebd
+tms/cmd/daemons/tdatabased/tdatabased
+tms/cmd/daemons/tauthd/tauthd
+tms/cmd/daemons/tgwad/tgwad
+
+tms/cmd/tools/tsimulator/tsimulator
+tms/cmd/tools/rsm/rsm
+/coverage.txt
+/.cover.txt.tmp

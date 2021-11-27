@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package prisma.tms.rest;
+
+message ErrorValidation {
+    string property = 1;
+    string rule = 2;
+    string message = 3;
+}

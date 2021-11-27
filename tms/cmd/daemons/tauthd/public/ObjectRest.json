@@ -1,0 +1,120 @@
+[
+	{
+		"ObjectClassId": "User",
+		"ObjectActions": [
+			{
+				"ObjectAction": "CREATE"
+			},
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "UPDATE"
+			},
+			{
+				"ObjectAction": "DELETE"
+			},
+			{
+				"ObjectAction": "UPDATE_ROLE"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Role",
+		"ObjectActions": [
+			{
+				"ObjectAction": "READ"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Profile",
+		"ObjectActions": [
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "UPDATE"
+			},
+			{
+				"ObjectAction": "UPDATE_PASSWORD"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Zone",
+		"ObjectActions": [
+			{
+				"ObjectAction": "CREATE"
+			},
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "UPDATE"
+			},
+			{
+				"ObjectAction": "DELETE"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Alert",
+		"ObjectActions": [
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "ACKNOWLEDGE"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Vessel",
+		"ObjectActions": [
+			{
+				"ObjectAction": "CREATE"
+			},
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "UPDATE"
+			},
+			{
+				"ObjectAction": "DELETE"
+			},
+			{
+				"ObjectAction": "UPDATE_DEVICE"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Device",
+		"ObjectActions": [
+			{
+				"ObjectAction": "READ"
+			}
+		]
+	},
+	{
+		"ObjectClassId": "Fleet",
+		"ObjectActions": [
+			{
+				"ObjectAction": "CREATE"
+			},
+			{
+				"ObjectAction": "READ"
+			},
+			{
+				"ObjectAction": "UPDATE"
+			},
+			{
+				"ObjectAction": "DELETE"
+			},
+			{
+				"ObjectAction": "UPDATE_VESSEL"
+			}
+		]
+	}
+]

@@ -1,0 +1,15 @@
+{
+  "service": {
+    "name": "tgwad",
+    "tags": ["tgwad", "streamer"],
+    "checks": [
+      {
+        "http": "http://localhost:8083/router/listeners",
+        "interval": "5s",
+        "timeout": "2s"
+      }
+    ],
+    "address": "110.0.0.11",
+    "port": 31228
+  }
+}

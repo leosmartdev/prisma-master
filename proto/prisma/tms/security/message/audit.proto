@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package prisma.tms.security.message;
+
+import "google/protobuf/timestamp.proto";
+
+message AuditRecord {
+    google.protobuf.Timestamp Created = 1;
+    string class_id = 2;
+    string object_id = 3;
+    string user_id = 4;
+    string action = 5;
+    string outcome = 6;
+    string payload = 7;
+    string session_id = 8;
+    string request_id = 9;
+}

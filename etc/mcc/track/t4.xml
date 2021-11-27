@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<topMessage>
+    <header dest="2770" orig="2570" number="14063" date="2014-10-14T13:46:17Z" />
+    <message>
+        <resolvedAlertMessage>
+            <header>
+                <siteId>27206</siteId>
+                <beacon>ADC667150EFE241</beacon>
+            </header>
+            <composite> 
+                <location latitude="1.5" longitude="1.4" />
+                <duration>PT1155M</duration>
+            </composite>
+            <elemental>
+                <side>B</side>
+                <location latitude="-3.6578" longitude="110.2108" />
+                <satellite>13</satellite>
+                <orbitNumber>10753</orbitNumber>
+                <tca>2014-10-14T13:40:19.954Z</tca>
+            </elemental>
+            <elemental>
+                <side>A</side>
+                <location latitude="-3.6584" longitude="110.2119" />
+                <satellite>13</satellite>
+                <orbitNumber>10753</orbitNumber>
+                <tca>2014-10-14T02:56:55.316Z</tca>
+            </elemental>
+            <elemental>
+                <side>A</side>
+                <location latitude="-3.6583" longitude="110.2113" />
+                <satellite>13</satellite>
+                <orbitNumber>10753</orbitNumber>
+                <tca>2014-10-14T01:17:21.963Z</tca>
+            </elemental>
+        </resolvedAlertMessage>
+    </message>
+</topMessage>

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname "$0")/..
+VERSION=$(ls $BASEDIR/dist/tms_* | cut -d_ -f2)
+
+rm -rf $BASEDIR/release
+mkdir -p $BASEDIR/release
+
+RELEASE=$BASEDIR/release
+mkdir $RELEASE/tms
+
+mkdir $RELEASE/tms/core
+cp $BASEDIR/dist/tms_*deb $RELEASE/tms/core
+( cd $RELEASE/tms/core ; aptitude download ejdb )
+
+mkdir $RELEASE/tms/db
+cp $BASEDIR/dist/tms-db_*deb $RELEASE/tms/db
+( cd $RELEASE/tms/db ; aptitude download \
+	libsysfs2 \
+	mongodb-org-mongos \
+	mongodb-org-server \
+	mongodb-org-shell \
+	mongodb-org-tools \
+	mongodb-org \
+	sysfsutils \
+)
+
+mkdir $RELEASE/tms/mcc
+cp $BASEDIR/dist/tms-mcc_*deb $RELEASE/tms/mcc
+( cd $RELEASE/tms/mcc ; aptitude download \
+	apache2-utils \
+	libapr1 \
+	libaprutil1 \
+	libpam-pwdfile \
+	vsftpd \
+)
+
+mkdir $RELEASE/tms-dev 
+cp $BASEDIR/dist/tms-dev_*deb $RELEASE/tms-dev
+( cd $RELEASE/tms-dev ; curl -s -O \
+	https://s3.amazonaws.com/prisma-data/tplayd/trident-data-batam_1-2_all.deb )
+
+( cd $RELEASE ; tar zcvf tms_${VERSION}.tar.gz tms tms-dev )
+
+
+

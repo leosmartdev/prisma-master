@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+// Extra info available with VTS
+package prisma.tms.vtsx;
+
+message VTSRadar {
+    string TrackName = 1;
+    string TrackMMSI = 2;
+    uint32 Quality = 3;
+}

@@ -1,0 +1,1 @@
+0 7 * * * root sudo -i /usr/sbin/tms-recycle-demo

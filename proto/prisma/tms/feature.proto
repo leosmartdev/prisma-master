@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+import "prisma/tms/common.proto";
+import "prisma/tms/devices/devices.proto";
+import "google/protobuf/any.proto";
+
+message Feature {
+    string id = 1;
+    google.protobuf.Any properties = 2;
+
+    oneof geometry {
+        Point point = 10;
+    }
+}
+
+message FeatureCollection {
+    repeated Feature features = 1;
+}
+
+enum FeatureCategory {
+    UnknownFeature = 0;
+    AllFeatures = 1;
+    TrackFeature = 10;
+    RouteFeature = 11;
+    ZoneFeature = 12;
+    IncidentFeature = 13;
+    TransmissionFeature = 14;
+    SiteFeature = 15;
+}
+
+message FeatureType {
+    FeatureCategory        type   = 1;
+
+    // Subtypes
+    prisma.tms.devices.DeviceType track_device = 10;
+}
+
+message Heatmap {
+    repeated DensityCell cells = 1;
+}
+
+message DensityCell {
+    double x = 1;
+    double y = 2;
+    uint32 count = 3;
+}

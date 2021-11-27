@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package prisma.tms;
+
+message Error {
+    string error = 1;
+    string stack = 2;
+}
+
+/**
+ * This provides the status to a request, message, transmission, etc...
+ * It provides a code to mark the type of status, as well as a human readable
+ * message, depending on context of the response, this can be used in a log
+ * message or even displayed to the user in a UI.
+ */
+message ResponseStatus {
+    /**
+    * List of generic system status codes and their values.
+    * The code ranges are similar to the HTTP status codes. Values in the 200s
+    * are sucess, 400s are user input errors, and 500 are server or coms errors.
+    */
+    enum SystemCodes {
+        Unknown = 0; // because proto3
+
+        /*
+        * 1XX Informational Codes
+        */
+        Pending = 102; // Message received, but pending completion or a response.
+
+        /*
+        * 2XX Success Codes
+        */
+        Success = 200; // generic success
+        Created = 201; // The resource has been created.
+        /*
+        * The Message is split into parts and some parts have returned successfully
+        * but not all are complete.
+        */
+        Partial = 206;
+        Sent = 210; // The message was successfully sent to the destination.
+        Acknowledged = 211; // The message was acknowledged by the destination.
+
+        /*
+        * 4XX Client/User/Input Errors
+        */
+        BadRequest = 400; // The request is bad or invalid.
+        Unauthorized = 401; // The requestor has not provided authentication details, and they are required.
+        Forbidden = 403; // Authorization has been provided, but the destination is refusing access.
+        NotFound = 404; // The destination was not found.
+        TooManyRequests = 429; // Too many messages have been sent and this message is being rejected.
+
+
+        /*
+        * 5XX System or Coms errors
+        */
+        Failed = 500; // Generic server failed error
+        NotImplemented = 501; // The message or request is not implemented on this system.
+        ServiceUnavailable = 503; // The destination or external router service is not available.
+        Timeout = 504; // Timeout occurred sending the message
+        IncompatibleVersion = 505; // The version of the message or payload is incompatible with the system.
+        /*
+        * The Message is split into parts and all have completed by some parts have resulted in failures.
+        */
+        PartialFailure = 520;
+    }
+
+    /**
+    * Integer code value to explain the status of the transmission or packet.
+    * Codes can fall into a number of categories. For system wide known codes, we
+    * reserve values from 1 to 999. Custom codes that are dependent on context (eg
+    * the destination type) can use values from 1000 up. In general, the generic
+    * codes are the suggested codes to use, and if you need to convey more information
+    * to the user, then the message below is the suggested place to set that information.
+    * Only use a custom code if other parts of the system given the context, and change it's
+    * behavior based on that custom code.
+    */
+    int32 code = 1;
+    /*
+    * Human readable message describing the failure. This may or may not be
+    * presented to a user depending on the status code.
+    */
+    string message = 2;
+}
+
+message Point {
+    double latitude = 1;
+    double longitude = 2;
+    double altitude = 3;
+}
+
+message LineString {
+    repeated Point points = 1;
+}
+
+message BBox {
+    Point min = 1;
+    Point max = 2;
+}
+
+message Polygon {
+    repeated LineString lines = 1;
+}
+
+// Color
+// Defaults to black
+message Color {
+    int32 r = 6;    // 0 - 255
+    int32 g = 7;    // 0 - 255
+    int32 b = 8;    // 0 - 255
+    float a = 9;    // 0.0 - 1.0
+}

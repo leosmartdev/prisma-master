@@ -1,0 +1,49 @@
+#!/bin/bash
+
+BASEDIR=$(pwd)
+BUILDDIR=${BASEDIR}/build/proto
+GODIR=${BUILDDIR}/go
+PYDIR=${BUILDDIR}/python
+TDEMO=${BASEDIR}/tms/cmd/tools/tdemo
+ACCEPTANCE_TEST=${BASEDIR}/tests/acceptance
+
+# Clean up previous protos from build directory
+rm -rf ${GODIR}
+rm -rf ${PYDIR}
+rm -rf ${TDEMO}/prisma
+
+# Create the directories
+mkdir -p ${BUILDDIR}
+mkdir -p ${GODIR}
+mkdir -p ${PYDIR}
+
+# Compile the protos into the build directory.
+DIRS=$(find ${BASEDIR}/proto/prisma/tms -type d)
+for DIR in ${DIRS}; do
+	FILES=$(ls ${DIR}/*.proto 2>/dev/null)
+	if [ "$FILES" != "" ] ; then
+		PACKAGE=$(echo ${DIR} | sed s_${BASEDIR}/proto/__g)
+		protoc \
+		-I ${BASEDIR}/proto \
+		--go_out=plugins=grpc,import_path=${PACKAGE}:${GODIR} \
+		--python_out=${PYDIR} \
+		${DIR}/*.proto
+	fi
+done
+
+# add bson:"-" tags
+pb-go-tag-bson -dir ${GODIR}/prisma/tms
+
+# Copy all go protos to the app directory.
+rsync -a ${GODIR}/prisma/tms ${BASEDIR}
+
+# Link the python compiled protos to the tests and tdemo command
+# If you want to add the python protos to other directories you can add the symbolic links here.
+# Be sure though to add the removal of the link to `../Makefile` clean target.
+# if [ ! -L $TDEMO/prisma ]; then
+# 	ln -s $PYDIR/prisma $TDEMO/prisma
+# fi
+
+# if [ ! -L $ACCEPTANCE_TEST/prisma ] && [ -d $ACCEPTANCE_TEST ]; then
+# 	ln -s $PYDIR/prisma $ACCEPTANCE_TEST/prisma;
+# fi

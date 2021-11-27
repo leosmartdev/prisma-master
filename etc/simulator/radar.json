@@ -1,0 +1,8 @@
+{
+  "device": "radar",
+  "pos": [{
+    "latitude": 1,
+    "longitude": 1,
+    "speed": 1
+  }]
+}

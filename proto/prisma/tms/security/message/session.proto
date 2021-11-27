@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package prisma.tms.security.message;
+
+import "prisma/tms/security/message/user.proto";
+import "prisma/tms/security/message/permission.proto";
+
+message Session {
+    string sessionId = 1;
+    prisma.tms.security.message.User user = 2;
+    repeated prisma.tms.security.message.Permission permissions = 3;
+    State state = 4;
+    enum State {
+        // not used, zero is considered not set
+        nonstate = 0;
+        activated = 1;
+        idled = 10;
+        renewing = 100;
+        expired = 1000;
+        terminated = 10000;
+    }
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        IDLE = 2;
+        EXPIRE = 3;
+        TERMINATE = 4;
+    }
+}

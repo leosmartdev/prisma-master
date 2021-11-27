@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package prisma.tms.security.policy;
+
+message UserPolicy {
+    string id = 1;
+    // auto-lock unused user accounts after 90 days
+    string inactiveDurationConsequenceLock = 2;
+    // auto-deactivate unused user accounts after 180 days
+    string inactiveDurationConsequenceDeactivate = 3;
+}

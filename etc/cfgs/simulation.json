@@ -1,0 +1,62 @@
+{
+    "data": [
+        {
+            "num": 10000,
+            "type": "drunkCpt"
+        }
+    ],
+
+    "stations": [
+        {
+            "name": "hq",
+            "id": 10,
+            "moc": true,
+            "addr": "localhost:31228",
+            "tv32Freq": 50,
+            "tracksApi": "localhost:8237"
+        },
+
+        {
+            "name": "css1",
+            "id": 20,
+            "addr": "localhost:31229",
+            "tv32Freq": 0,
+            "reportsTo": ["hq"],
+
+            "sensors": [
+                {
+                    "type": "radar",
+                    "lat": 1.2,
+                    "long": 104,
+                    "range": 500000,
+                    "period": "17s"
+                },
+                {
+                    "type": "ais",
+                    "lat": 1.2,
+                    "long": 104,
+                    "range": 1000000,
+                    "period": "60s"
+                }
+            ],
+
+            "video": [
+                {
+                    "id": 4,
+                    "byterate": 500000,
+                    "dst": "hq"
+                },
+                {
+                    "id": 5,
+                    "byterate": 500000,
+                    "dst": "hq"
+                },
+                {
+                    "id": 6,
+                    "byterate": 500000,
+                    "dst": "hq"
+                }
+            ]
+        }
+    ]
+}

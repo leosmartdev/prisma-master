@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+package prisma.tms;
+option java_package="com.technosci.tms.message";
+
+message TmsInfo {
+    repeated ProcessInfo processes = 1;
+    CpuUsage cpuUsage = 2;
+    MemUsage memUsage = 3;
+    DiskUsage diskUsage = 4;
+}
+
+message TnoidInfo {
+    TnoidConfiguration tnoidConfiguration = 1;
+    HostInfo hostInfo = 2;
+    uint32 uptime = 3;
+    uint32 sentRequests = 4;
+    uint32 gotErrors = 5;
+    google.protobuf.Any lastMsg = 6;
+}
+
+message TnoidConfiguration {
+    string Name = 1;
+    string host = 2;
+    string port = 3;
+    GeoPoint radarPosition = 4;
+}
+
+message GeoPoint {
+    float lat = 1;
+    float lng = 2;
+}
+
+message HostInfo {
+    string ip = 1;
+    string name = 2;
+    CpuUsage cpuUsage = 3;
+    MemUsage memUsage = 4;
+    DiskUsage diskUsage = 5;
+}
+
+message ProcessInfo {
+    enum Status {
+        NOT_LAUNCH = 0;
+        RUNNING = 1;
+        CRASHED = 2;
+        STOPPED = 3;
+        UNKNOWN = 4;
+    }
+    uint32 pid = 1;
+    string name = 2;
+    Status status = 3;
+    uint32 started_times = 4;
+    google.protobuf.Timestamp last_start = 5;
+}
+
+message CpuUsage {
+    string load_avg_1 = 1;
+    string load_avg_10 = 2;
+    string load_avg_15 = 3;
+    string exec_exist_rate = 4;
+    string cpu_usage_rate = 5;
+}
+
+message MemUsage {
+    string total = 1;
+    string used = 2;
+    string free = 3;
+}
+
+message DiskUsage {
+    string size = 1;
+    string used = 2;
+    string avail = 3;
+}

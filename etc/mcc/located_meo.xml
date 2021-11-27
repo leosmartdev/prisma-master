@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<topMessage>
+    <header dest="43AR" orig="4310" number="00023" date="2015-03-03T19:54:24Z" />
+    <message>
+        <incidentAlertMessage>
+            <header>
+                <siteId>128</siteId>
+                <beacon>A608130D34D34D1</beacon>
+            </header>
+            <meoElemental>
+                <satellite>312</satellite>
+                <tca>2015-03-02T16:20:39.895Z</tca>
+                <doa>
+                    <location latitude="1.8900" longitude="107.2116" />
+                </doa>
+            </meoElemental>
+        </incidentAlertMessage>
+    </message>
+</topMessage>

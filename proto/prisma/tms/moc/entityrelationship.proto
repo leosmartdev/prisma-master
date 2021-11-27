@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "google/protobuf/timestamp.proto";
+
+message EntityRelationship {
+    string type = 1;
+    string id = 2;
+    google.protobuf.Timestamp update_time = 3;
+    Relationship relationship = 4;
+     enum Relationship {
+         UNKNOWN = 0;
+         UPLOAD = 1;
+         EXCLUDE = 2;
+         ATTACH = 3;
+     }
+}

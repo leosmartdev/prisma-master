@@ -1,0 +1,56 @@
+syntax = 'proto3';
+
+import "prisma/tms/omnicom/Omnicom.proto";
+
+package prisma.tms.iridium;
+
+message Iridium {
+    repeated string errors = 1;
+    MobileOriginatedHeader moh =  1003;
+    MobileTerminatedHeader mth = 1004;
+    MobileOriginatedLocationInformation moli = 1005;
+    Payload payload = 1006;
+    MessageTerminatedConfirmation  mtc = 1007;
+}
+
+message MobileOriginatedHeader {
+    bytes MO_IEI = 1;
+    uint32 MOHL = 2;
+    uint32 CDR = 3;
+    string IMEI = 4;
+    string SessStatus = 5;
+    uint32 MOMSN = 6;
+    uint32 MTMSN = 7;
+    uint32 TimeOfSession = 8;
+}
+
+message MobileTerminatedHeader {
+    bytes MO_IEI =1;
+    uint32 MTHL =2;
+    string UniqueClientMessageID =3;
+    string IMEI =4;
+    uint32 MTflag =5;
+}
+
+message MobileOriginatedLocationInformation {
+    bytes IEI = 1;
+    uint32 Length = 2;
+    double Latitude = 3;
+    double Longitude = 4;
+    uint32 CEP = 5;
+}
+
+message Payload {
+    bytes IEI = 1;
+    uint32 PayloadL = 2;
+    prisma.tms.omnicom.Omni Omnicom = 3;
+}
+
+message MessageTerminatedConfirmation {
+    bytes IEI = 1;
+    uint32 MTCL = 2;
+    int32 UCM_IF = 3;
+    string IMEI = 4;
+    uint32 Auto_IDR = 5;
+    int32 MT_Message_Status = 6; 
+}

@@ -1,0 +1,158 @@
+syntax = "proto2";
+
+import "google/protobuf/timestamp.proto";
+
+package prisma.tms.tv32;
+
+option java_package="com.technosci.tms.message";
+option java_outer_classname="Tv32Message";
+
+message TV32Data {
+    required google.protobuf.Timestamp tv32_time = 1;
+}
+
+// Request a region from TV32 system
+message RegionRequest {
+
+    // NOTE enum id is 1 << id
+    enum Rate {
+        ALL = 0;
+        UNIQUE = 1;
+        PERIOD_30_SEC = 2;
+        PERIOD_1_MIN = 3;
+        PERIOD_2_MIN = 4;
+        PERIOD_5_MIN = 5;
+        PERIOD_10_MIN = 6;
+        PERIOD_15_MIN = 7;
+        PERIOD_30_MIN = 8;
+        PERIOD_60_MIN = 9;
+    }
+
+    // NOTE enum id is 1 << id
+    enum Region {
+        ALL_OTHERS = 0;
+        EEZ_EAST = 1;
+        EEZ_GULF = 2;
+        EEZ_CARIBBEAN = 3;
+        EEZ_WEST = 4;
+        CZ_EAST = 5;
+        CZ_GULF = 6;
+        CZ_WEST = 7;
+
+        MED_WEST = 10;
+        MED_EAST = 11;
+        BLACK_SEA = 12;
+        EURO_WEST = 13;
+        EURO_EAST = 14;
+        AFRICA_WEST = 15;
+        AFRICA_EAST = 16;
+        PERSIAN_GULF = 17;
+
+        LATENT_SAPCE = 25;
+        LATENT_OTHER = 26;
+
+        SAFETY = 28;
+        RADAR = 29;
+        SURETRAK = 30;
+        TEST = 31;
+
+        NONE = 32; // special case, select nothing
+        WORLD = 33; // special case, select everything
+    }
+
+    enum JoinType {
+        SELECT_REGIONS = 0;
+        SELECTION_BOX = 1;
+        REGIONS_AND_BOX = 2;
+        REGIONS_OR_BOX = 3;
+    }
+
+    optional int32 number = 1;
+    optional Rate rate = 2;
+    repeated Region regions = 3;
+    optional JoinType join_type = 4;
+}
+
+
+message Pvol {
+    optional Login login = 1;
+    optional Msg msg = 2;
+    optional Rgnreqn rgnreq = 3;
+    optional Stnreq stnreq = 7;
+    optional Stnlconf stnlconf = 8;
+    optional Heartbeat heartbeat = 9;
+}
+
+// $PVOL,MSSIS,LOGIN,c--c,c--c,c--c,c--c,c--c*hh
+// c--c #1 is the username
+// c--c #2 is the password
+// c--c #3 is ???
+// c--c #4 is application name
+// c--c #5 is application version
+message Login {
+    optional string username = 1;
+    optional string password = 2;
+    optional string unknown = 3;
+    optional string application_name = 4;
+    optional string application_version = 5;
+}
+
+// $PVOL,MSSIS,MSG,c--c*hh
+// c--c is the message being sent such as "password required"
+message Msg {
+    optional string message = 1;
+}
+
+// Defines a rate and regions of desired data
+// hhhhhhhh #1 is the rate at which data should be reported, it appears to
+//          to be some sort of "mask" even though it shouldn't really be
+// hhhhhhhh #2 is the data set from which tracks should be pulled. This is
+//          a proper data mask.
+// f.f are lat and lon defining a request box
+// x defines the join type between the lat/lon and the data set region.
+//
+// $PVOL,MSSIS,RGNREQ1,hhhhhhhh,hhhhhhhh,f.f,f.f,f.f,x*hh
+message Rgnreqn {
+    optional int32 number = 1;
+    optional uint32 report_rate = 2;
+    optional uint32 regions = 3;
+    optional double ul_lon= 4;
+    optional double ul_lat = 5;
+    optional double lr_lon = 6;
+    optional double lr_lat = 7;
+    optional int32 join_type = 8;
+}
+
+// $PVOL,MSSIS,STNREQ,xxxxxxxx,*hh
+message Stnreq {
+    optional string unknown = 1;
+}
+
+// fetch the stunnel configuration values
+// stunnel4 conf files are defined by sections, ie:
+// [Internet <---> C2F Distributor]
+// client=yes
+// accept=127.0.0.1:2103
+// connect=70.169.146.161:9000
+//
+// It has the form (just as ini files have):
+// [section]
+// variable = value
+//
+// $PVOL,MSSIS,STNLCONF,c--c,c--c,c--c,c--c*hh
+// c--c #1 is msg type such as GET or RESULT
+// c--c #2 is ???
+// c--c #3 is request state ??? such as "connect"
+// c--c #4 is the result field
+message Stnlconf {
+    optional string type = 1;
+    optional string section = 2;
+    optional string variable = 3;
+    optional string value = 4;
+}
+
+message Heartbeat {
+    optional int32 port = 1;
+    optional int32 uptime = 2;
+    optional google.protobuf.Timestamp sent = 3;
+}

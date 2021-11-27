@@ -1,0 +1,31 @@
+#!/bin/bash
+
+BASEDIR=$(dirname "$0")
+
+tmsd --stop
+
+# Clear out the database
+sudo systemctl stop mongod
+rm -rf /var/trident/db-it/*
+
+sleep 2s
+
+$BASEDIR/start-db
+sleep 2s
+mongo localhost:27017 /etc/trident/db/replication.js
+sleep 5s
+mongo localhost:27017/trident /usr/share/tms-db/mongo/schema/trident.js
+sleep 5s
+mongo localhost:27017/aaa /usr/share/tms-db/mongo/schema/aaa.js
+
+# Start TMS with test configurations
+tmsd --start --config $BASEDIR/tmsd.conf &
+
+sleep 5s
+
+tmsd --info 
+
+echo "sleeping for a minute..."
+sleep 60s
+
+#think about testing separate tmsd.confs based on various testing scenarios

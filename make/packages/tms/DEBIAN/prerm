@@ -1,0 +1,4 @@
+#!/bin/bash
+
+systemctl stop tms.service
+exit 0

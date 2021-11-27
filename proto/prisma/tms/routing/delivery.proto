@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package prisma.tms.routing;
+
+message DeliveryReport {
+    enum Status {
+        UNKNOWN = 0;
+        SENT = 1;
+        FAILED = 2;
+        PROCESSED = 3;
+    }
+
+    int32 notify_id = 1;
+    Status status = 2;
+}

@@ -1,0 +1,9 @@
+syntax="proto3";
+
+package prisma.tms.moc;
+
+message History {
+    enum Action {
+        GET = 0;
+    }
+}

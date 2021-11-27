@@ -1,0 +1,12 @@
+[Unit]
+Description=TMS
+After=syslog.target network.target
+
+[Service]
+User=prisma
+Group=prisma
+ExecStart=/usr/sbin/tmsd --start
+ExecStop=/usr/sbin/tmsd --stop
+
+[Install]
+WantedBy=multi-user.target

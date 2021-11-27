@@ -1,0 +1,17 @@
+syntax = 'proto3';
+
+package prisma.tms.ingenu;
+
+
+message DatagramUplinkEvent {
+    string nodeid = 1;
+    uint32 applicationid = 2;
+    uint64 timestamp = 3;
+    string payload = 4;
+}
+
+message DatagramDownlinkRequest {
+    string tag = 1;
+    string nodeid = 2;
+    string payload = 3;
+}

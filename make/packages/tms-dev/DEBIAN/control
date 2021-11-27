@@ -1,0 +1,9 @@
+Package: tms-dev
+Version: @VERSION@-@DEBIAN_REVISION@.@TIMESTAMP@.git@COMMIT@
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: tms (= @VERSION@-@DEBIAN_REVISION@.@TIMESTAMP@.git@COMMIT@)
+Maintainer: Orolia
+Description: TMS - Development Tools
+

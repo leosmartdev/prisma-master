@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package prisma.tms.security.message;
+
+import "google/protobuf/timestamp.proto";
+
+message User {
+    string userId = 1;
+    State state = 2;
+    repeated string roles = 3;
+    UserProfile profile = 4;
+    repeated PasswordLogEntry passwordLog = 5;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DEACTIVATE = 3;
+        UPDATE_ROLE = 4;
+        LOCK = 5;
+        ACTIVATE = 6;
+        INITIALIZE = 7;
+    }
+    enum State {
+        // not used, zero is considered not set
+        nonstate = 0;
+        initialized = 1;
+        locked = 10;
+        activated = 100;
+        deactivated = 1000;
+    }
+}
+
+message UserProfile {
+    string lastName = 1;
+    string firstName = 2;
+    enum Action {
+        READ = 0;
+        UPDATE = 1;
+        UPDATE_PASSWORD = 2;
+    }
+}
+
+message PasswordLogEntry {
+    string passwordHash = 1;
+    google.protobuf.Timestamp timestamp = 2;
+}

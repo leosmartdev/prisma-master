@@ -1,0 +1,465 @@
+//
+// Copyright 2010 Techno-Sciences Inc.  All Rights Reserved.
+//
+// Techno-Sciences
+// 11750 Beltsville Dr.
+// Beltsville MD  20705
+//
+
+syntax = "proto3";
+
+package prisma.tms.nmea;
+
+option java_package="mcm.proto.nmea";
+option java_outer_classname="M1731";
+
+//
+// messages used to correspond to Nmea sentences
+// the common parts between messages
+//
+
+message M1371 {
+     uint32 message_id = 1;
+     uint32 repeat_indicator = 2;
+     uint32 mmsi = 3;
+
+     M1371_Position             pos = 1003;
+     M1371_BaseStationReport    station_report = 1004;
+     M1371_Static               static_voyage = 1005;
+     M1371_AddressedBinary      addr_bin = 1006;
+     M1371_BinaryAck            bin_ack = 1007;
+     M1371_BinaryBroadcast      bin_bcast = 1008;
+     M1371_SarAircraftPosition  aircraft_pos = 1009;
+     M1371_DateInquiry          date_inq = 1010;
+    // M1371_DateResponse       date_resp = 1011; -- see 4
+     M1371_AddressedSafety      addr_safety = 1012;
+    // M1371_SafetyAck          safety_ack = 1013; -- see 7
+     M1371_SafetyBroadcast      safety_bcast = 1014;
+     M1371_Interrogation        interrogation = 1015;
+     M1371_AssignedMode         assign_mode = 1016;
+     M1371_GnssBinaryBroadcast  gnss_bin_bcast = 1017;
+     M1371_PositionB            b_pos = 1018;
+     M1371_PositionBExtended    b_ext_pos = 1019;
+     M1371_DatalinkManagement   link_mgt = 1020;
+     M1371_AidsToNav            aid_to_nav = 1021;
+     M1371_ChannelManagement    chan_mgt = 1022;
+     M1371_GroupAssignment      grp_assgin = 1023;
+     M1371_StaticDataA          static_data_a = 1024;
+     M1371_SingleSlotBinary     single_slot_bin = 1025;
+     M1371_MultiSlotBinary      multi_slot_bin = 1026;
+     M1371_StaticDataB          static_data_b = 1027;
+     M1371_LongRangePosition    long_range_pos = 1028;
+}
+
+// message 1, 3, 3
+// message 1, 2 is SOTDMA
+// message 3 is ITDMA
+message  M1371_Position {
+     uint32 navigational_status = 4; // 0 to 15
+     int32 rate_of_turn = 5; // ROT=4.733*SQRT(value) +/-127, -128 is NA
+     uint32 speed_over_ground = 6; // 10ths of knot, 0 to 1022, 1023 is NA
+     bool position_accuracy = 7;
+     double longitude = 8; // +/-180, 181 is NA
+     double latitude = 9; // +/-90, 91 is NA
+     uint32 course_over_ground = 10; // 10ths of degree, 0 to 3599, 3600 is NA
+     uint32 true_heading = 11; // degrees, 0 to 359, 511 is NA
+     uint32 time_stamp = 12; // UTC seconds, 0-59
+     uint32 special_manoeuvre = 13; // 0 = NA, 1 = not engaged, 2 = engaged
+     bytes spare = 14; // spare bits, should be zero
+     int32 spare_size = 16; // [default = 3]; // int bits
+     bool raim_flag = 17; // true if RAIM is in use
+     bytes comm_state = 18; // see m1371 3.3.7.3.2
+}
+
+// message 4 and 11
+message M1371_BaseStationReport {
+     uint32 utc_year = 1; // 1-1999; 0 = NA
+     uint32 utc_month = 2; // 1-12; 0 = NA
+     uint32 utc_day = 3; // 1-31; 0 = NA
+     uint32 utc_hour = 4; // 0-23; 24 = NA
+     uint32 utc_minute = 5; // 0-59; 60 = NA
+     uint32 utc_second = 6; // 0-59; 60 = NA
+     bool position_accuracy = 7; // 1 = high > 10m, 0 = low < 10m
+     double longitude = 8; // +/-180, 181 is NA
+     double latitude = 9; // +/-90, 91 is NA
+     uint32 position_device = 10; // 0 is NA, 1 to 8 see table 49, 9 to 15 not used
+     bytes spare = 11; // spare bits, should be zero
+     int32 spare_size = 12; // [default = 3]; // int bits
+     bool raim_flag = 13; // true if RAIM is in use
+     bytes comm_state = 14; // see m1371 3.3.7.3.2
+}
+
+// message 5
+message M1371_Static {
+     uint32 ais_version = 1; // 0 = M1371-1, 1 = M1371-3, 2,3 = future edition
+     uint32 imo_number = 2; // 0 is NA, 1-999999999
+     string call_sign = 3; // 7 char vessel callsign
+     string name = 4; // 20 char vessel name
+     uint32 ship_and_cargo_type = 5; // 0 is NA, 1-99 see 3.3.2, 100-199 regional use, 200-255 future use
+     uint32 dim_bow = 6; // 0 to 510, 511 = big
+     uint32 dim_stern = 7; // 0 to 510, 511 = big
+     uint32 dim_port = 8; // 0 to 62, 63 = big
+     uint32 dim_starboard = 9; // 0 to 62, 63 = big
+     uint32 position_device = 10; // 0 is NA, 1 to 8 see table 49, 9 to 15 not used
+     uint32 eta_month = 11;
+     uint32 eta_day = 12;
+     uint32 eta_hour = 13;
+     uint32 eta_minute = 14;
+     uint32 draught = 15; // 10ths of meter, 255 = big, 0 is NA
+     string destination = 16;
+     bool data_terminal_avail = 17; // 0 = available, 1 = not available
+     bytes spare = 18;
+     int32 spare_size = 19; // [default = 1]; // in bits
+
+}
+
+// message 6
+message M1371_AddressedBinary {
+
+     uint32 seq_number = 1; // 0 to 3, see 5.3.1
+     uint32 destination_id = 2; // mmsi of the destination satation
+     bool retransmit_flag = 3; // true if should retransmit
+     bytes spare = 4;
+     int32 spare_size = 5; // [default = 1]; // int bits
+     uint32 designated_area_code = 6; // based on mid http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
+     uint32 function_id = 7; // 0-64
+     bytes application_data = 8; // app bin data must be 115 bytes
+     int32 app_data_size = 9; // in bits
+}
+
+// message 7 and 13
+message M1371_BinaryAck {
+     bytes spare = 1;
+     int32 spare_size = 2; // [default = 2]; // in bits
+     uint32 destination_1_id = 3; // mmsi of the dest1 ack
+     uint32 seq_number_1 = 4; // 0 to 3
+     uint32 destination_2_id = 5; // mmsi of the dest2 ack
+     uint32 seq_number_2 = 6; // 0 to 3
+     uint32 destination_3_id = 7; // mmsi of the dest3 ack
+     uint32 seq_number_3 = 8; // 0 to 3
+     uint32 destination_4_id = 9; // mmsi of the dest4 ack
+     uint32 seq_number_4 = 10; // 0 to 3
+}
+
+// message 8
+message M1371_BinaryBroadcast {
+
+     bytes spare = 4;
+     int32 spare_size = 5; //[default = 2]; // int bits
+     uint32 designated_area_code = 6; // based on mid http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
+     uint32 function_id = 7; // 0-64
+     bytes application_data = 8; // app bin data must be 119 bytes
+     int32 app_data_size = 9; // in bits
+}
+
+// message 9
+message M1371_SarAircraftPosition {
+     uint32 altitude = 1; // 0 to 4094 in meters, 4094 = big, 4095 = NA
+     uint32 speed_over_ground = 2; // 10ths of knot, 0 to 1022, 1023 is NA
+     bool position_accuracy = 3; // 1 = high > 10m, 0 = low < 10m
+     double longitude = 4; // +/-180, 181 is NA
+     double latitude = 5; // +/-90, 91 is NA
+     uint32 course_over_ground = 6; // 10ths of degree, 0 to 3599, 3600 is NA
+     uint32 time_stamp = 7; // date and time in ms
+     bool altitude_sensor_flag = 8; // 0 = GNSS, 1 = barometric source
+     bytes spare_1 = 9;
+     int32 spare_1_size = 10; // [default = 3]; // in bits
+     bool data_terminal_avail = 11; // 0 = available, 1 = not
+     bytes spare_2 = 12;
+     int32 spare_2_size = 13; // [default = 3]; // int bits
+     bool assigned_mode_flag = 14; // 0 = autonomous, 1 = assigned
+     bool raim_flag = 15;
+     bool comm_state_select_flag = 16; // 0 = SOTDMA, 1 = ITDMA communication state
+     int32 comm_state = 17; // TODO see message 1/2/3
+}
+
+// message 10
+message M1371_DateInquiry {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     uint32 destination_id = 3; // mmsi of the requested station
+     bytes spare_2 = 4;
+     int32 spare_2_size = 5; // [default = 2]; // in bits
+}
+
+// message 11 -- see message 4
+//message M1371_DateResponse {
+//}
+
+// message 12
+message M1371_AddressedSafety {
+     uint32 seq_number = 1; // 0 to 3, see 5.3.1
+     uint32 destination_id = 2; // mmsi of the destination satation
+     bool retransmit_flag = 3; // true if should retransmit
+     bytes spare = 4;
+     int32 spare_size = 5; // [default = 1]; // in bits
+     string text = 6; // 6-bit ascii, max 118 char
+}
+
+// message 13 -- see message 7
+//message M1371_SafetyAck {
+//}
+
+// message 14
+message M1371_SafetyBroadcast {
+     bytes spare = 1;
+     int32 spare_size = 2; // [default = 2]; // in bits
+     string text = 3; // 6-bit ascii
+}
+
+// message 15
+message M1371_Interrogation {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     uint32 destination_1_id = 3; // mmsi for 1st interrogated
+     uint32 message_1_1_id = 4; // requested message type
+     uint32 slot_offset_1_1 = 5; // response slot offset
+     bytes spare_2 = 6;
+     int32 spare_2_size = 7; // [default = 2]; // in bits
+     uint32 message_1_2_id = 8; // requested message type
+     uint32 slot_offset_1_2 = 9; // response slot offset
+     bytes spare_3 = 10;
+     int32 spare_3_size = 11; // [default = 2]; // in bits
+     uint32 destination_2_id = 12; // mmsi for 2nd interrogated
+     uint32 message_2_1_id = 13; // requested message type
+     uint32 slot_offset_2_1 = 14; // response slot offset
+     bytes spare_4 = 15;
+     int32 spare_4_size = 16; // [default = 2]; // in bits
+}
+
+// message 16
+message M1371_AssignedMode {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     uint32 destination_A_id = 3; // mmsi of dest A
+     uint32 offset_A = 4; // offset from current slot to first assigned slot
+     uint32 increment_A = 5; // increment to next assigned slot
+     uint32 destination_B_id = 6; // mmsi of dest B
+     uint32 offset_B = 7; // offset from current slot to first assigned slot
+     uint32 increment_B = 8; // increment to next assigned slot
+     bytes spare_2 = 9;
+     int32 spare_2_size = 10; // [default = 2]; // in bits
+}
+
+// message 17
+message M1371_GnssBinaryBroadcast {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     double longitude = 3; // +/-180, 181 is NA, in 1/10 min
+     double latitude = 4; // +/-90, 91 is NA, in 1/10 min
+     bytes spare_2 = 5;
+     int32 spare_2_size = 6; // [default = 2]; // in bits
+     uint32 message_type = 7;
+     uint32 station_id = 8;
+     uint32 z_count = 9; // time value in 0.6s (0-3 599.4)
+     uint32 seq_number = 10; // 0-7
+     uint32 n = 11; // number of DGNSS data words to follow, 0-29
+     uint32 health = 12;
+     bytes dgnss_data_words = 13; // DGNSS words
+    // TODO see ITU-R M823 for details
+}
+
+// message 18
+message M1371_PositionB {
+     uint32 spare = 1; // distress signal 0=all clear, 255=distress
+     uint32 speed_over_ground = 3; // 10ths of knot, 0 to 1022, 1023 is NA
+     bool position_accuracy = 4; // 1 = high > 10m, 0 = low < 10m
+     double longitude = 5; // +/-180, 181 is NA
+     double latitude = 6; // +/-90, 91 is NA
+     uint32 course_over_ground = 7; // 10ths of degree, 0 to 3599, 3600 is NA
+     uint32 true_heading = 8; // degrees, 0 to 359, 511 is NA
+     uint32 time_stamp = 9; // UTC second when report was generated
+     bytes spare_2 = 10;
+     int32 spare_2_size = 11; // [default = 2]; // in bits
+     bool unit_flag = 12; // 0 = SOTDMA unit, 1 = "CS" unit
+     bool display_flag = 13; // 0 = no display, 1 = display for msg 12 and 14
+     bool dsc_flag = 14; // 0 = no dsc function, 1 = has dsc function
+     bool band_flag = 15; // 0 = can operate over 525 kHz, 1 = can operate over whoe marine band
+     bool message_22_flag = 16; // 0 = no channel management, 1 = can (see msg 22)
+     bool mode_flag = 17; // 0 = autonomous, 1 = assigned mode
+
+    // TODO raim and comm_state are not joined with message 1/2/3 because
+    //      they are sort of weird unimplemented by us message pieces
+     bool raim_flag = 18;
+     bool comm_state_select_flag = 19; // 0 = SOTDMA, 1 = ITDMA communication state
+     bytes comm_state = 20; // TODO see message 1/2/3
+}
+
+// message 19
+message M1371_PositionBExtended {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 8]; // in bits
+     uint32 speed_over_ground = 3; // 10ths of knot, 0 to 1022, 1023 is NA
+     bool position_accuracy = 4;
+     double longitude = 5; // +/-180, 181 is NA
+     double latitude = 6; // +/-90, 91 is NA
+     uint32 course_over_ground = 7; // 10ths of degree, 0 to 3599, 3600 is NA
+     uint32 true_heading = 8; // degrees, 0 to 359, 511 is NA
+     uint32 time_stamp = 9; // UTC second when report was generated
+     bytes spare_2 = 10; // spare bits, should be zero
+     int32 spare_2_size = 11; // [default = 4]; // in bits
+     string name = 12; // 20 char vessel name
+     uint32 ship_and_cargo_type = 13; // 0 is NA, 1-99 see 3.3.2, 100-199 regional use, 200-255 future use
+     uint32 dim_bow = 14; // 0 to 510, 511 = big
+     uint32 dim_stern = 15; // 0 to 510, 511 = big
+     uint32 dim_port = 16; // 0 to 62, 63 = big
+     uint32 dim_starboard = 17; // 0 to 62, 63 = big
+     uint32 position_device = 18; // 0 is NA, 1 to 8 see table 49, 9 to 15 not used
+     bool raim_flag = 19;
+     bool data_terminal_avail = 20; // 0 = available, 1 = not
+     bool assigned_mode_flag = 21; // 0 = autonomous, 1 = assigned mode
+     bytes spare_3 = 22; // spare bits, should be zero
+     int32 spare_3_size = 23; // [default = 4]; // in bits
+}
+
+// message 20
+message M1371_DatalinkManagement {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     uint32 offset_1 = 3; // reserved offset number; 0 = NA
+     uint32 slot_count_1 = 4; // num of reserved consec slots 1-15, 0 = NA
+     uint32 timeout_1 = 5; // timeout in minutes, 0 = NA
+     uint32 increment_1 = 6; // increment to repeat reserv block 1, 0 = one reserv block per frame
+
+     uint32 offset_2 = 7; // reserved offset number; 0 = NA
+     uint32 slot_count_2 = 8; // num of reserved consec slots 1-15, 0 = NA
+     uint32 timeout_2 = 9; // timeout in minutes, 0 = NA
+     uint32 increment_2 = 10; // increment to repeat reserv block 1, 0 = one reserv block per frame
+
+     uint32 offset_3 = 11; // reserved offset number; 0 = NA
+     uint32 slot_count_3 = 12; // num of reserved consec slots 1-15, 0 = NA
+     uint32 timeout_3 = 13; // timeout in minutes, 0 = NA
+     uint32 increment_3 = 14; // increment to repeat reserv block 1, 0 = one reserv block per frame
+
+     uint32 offset_4 = 15; // reserved offset number; 0 = NA
+     uint32 slot_count_4 = 16; // num of reserved consec slots 1-15, 0 = NA
+     uint32 timeout_4 = 17; // timeout in minutes, 0 = NA
+     uint32 increment_4 = 18; // increment to repeat reserv block 1, 0 = one reserv block per frame
+
+     bytes spare_2 = 19;
+     int32 spare_2_size = 20; // [default = 6]; // in bits
+}
+
+// message 21
+message M1371_AidsToNav {
+     uint32 a2n_type = 1; // 0 = NA, others see table 71
+     string name = 2; // 20 char name
+     bool position_accuracy = 3;
+     double longitude = 4; // +/-180, 181 is NA
+     double latitude = 5; // +/-90, 91 is NA
+     uint32 dim_bow = 6; // 0 to 510, 511 = big
+     uint32 dim_stern = 7; // 0 to 510, 511 = big
+     uint32 dim_port = 8; // 0 to 62, 63 = big
+     uint32 dim_starboard = 9; // 0 to 62, 63 = big
+     uint32 position_device = 10; // 0 is NA, 1 to 8 see table 49,    9 to 15 not used
+     uint32 time_stamp = 11; // 0-59
+     bool off_pos_indicator = 12; // 0 = on pos, 1 = off pos
+     uint32 a2n_status = 13; // reserved
+     bool raim_flag = 14; // true if RAIM is in use
+     bool virtual_flag = 15; // 0 = real, 1 = virtual
+     bool assigned_mode_flag = 16; // 0 = autonomous, 1 = assigned
+     bytes spare_1 = 17;
+     int32 spare_1_size = 18; // [default = 1];
+     string name_extension = 19;
+     bytes spare_2 = 20;
+     int32 spare_2_size = 21; // [default = 6];
+}
+
+
+// message 22
+message M1371_ChannelManagement {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     uint32 channel_A = 3; // chan num according to ITU-R M1084
+     uint32 channel_B = 4; // chan num according to ITU-R M1084
+
+    // 0 = Tx A/Tx B, Rx A/Rx B
+    // 1 = Tx A, Rx A/Rx B
+    // 2 = Tx B, Rx A/Rx B
+    // 3-15 not used
+     uint32 tx_rx_mode = 5;
+     bool power = 6; // 0 = high, 1 = low
+     double longitude_1 = 7; // +/-180, 181 is NA
+     double latitude_1 = 8; // +/-90, 91 is NA
+     double longitude_2 = 9; // +/-180, 181 is NA
+     double latitude_2 = 10; // +/-90, 91 is NA
+     bool addr_bcast = 11; // 0 = bcast, 1 = addressed
+     bool channel_A_bandwidth = 12; // 0 = default, 1 = spare
+     bool channel_B_bandwidth = 13; // 0 = default, 1 = spare
+     uint32 transitional_zone_size = 14; // zone size in nautical miles
+     bytes spare_2 = 15;
+     int32 spare_2_size = 16; // [default = 23]; // in bits
+}
+
+// message 23
+message M1371_GroupAssignment {
+     bytes spare_1 = 1;
+     int32 spare_1_size = 2; // [default = 2]; // in bits
+     double longitude_1 = 3; // +/-180, 181 is NA
+     double latitude_1 = 4; // +/-90, 91 is NA
+     double longitude_2 = 5; // +/-180, 181 is NA
+     double latitude_2 = 6; // +/-90, 91 is NA
+     uint32 station_type = 7; // 0 = all types, 1 = reserved, 2 = all types of class B, 3 = SAR, 4 = AtoN, 5 = class B "CS", 6 = inland waterways, 7 to 9 = regional use, 10 to 15 = reserved
+     uint32 ship_and_cargo_type = 8; // 0 is NA, 1-99 see 3.3.2, 100-199 regional use, 200-255 future use
+     bytes spare_2 = 9;
+     int32 spare_2_size = 10; // [default = 22]; // in bits
+     uint32 tx_rx_mode = 11;
+     uint32 report_interval = 12;
+     uint32 quiet_time = 13;
+     bytes spare_3 = 14;
+     int32 spare_3_size = 15; // [default = 6];
+}
+
+// message 24A
+// TODO this weird message is broken up into pieces A & B
+//      (A) contains name, and (B) contains the rest
+message M1371_StaticDataA {
+     uint32 part_number = 1; // 2 bits, 0 = A, 1 = B
+     string name = 2; // 20 char vessel name
+}
+
+// message 24B
+message M1371_StaticDataB {
+     uint32 part_number = 1; // 2 bits, 0 = A, 1 = B
+     uint32 ship_and_cargo_type = 3; // 0 is NA, 1-99 see 3.3.2, 100-199 regional use, 200-255 future use
+     string vendor_id = 4; // 7 char string to id the manufacturer
+     string call_sign = 5; // 7 char vessel callsign
+     uint32 dim_bow = 6; // 0 to 510, 511 = big
+     uint32 dim_stern = 7; // 0 to 510, 511 = big
+     uint32 dim_port = 8; // 0 to 62, 63 = big
+     uint32 dim_starboard = 9; // 0 to 62, 63 = big
+     bytes spare = 10; // spare bits, should be zero
+     int32 spare_size = 11; // [default = 6];
+}
+
+
+// message 25
+message M1371_SingleSlotBinary {
+     bool destination_indicator = 1; // 1 = has destination_id, 0 = broadcast
+     bool binary_data_flag = 2; // 0 = unstructured bin data, 1 = binary data coded as defined by the application-id (designated_area_code and function_id)
+     uint32 destination_id = 3; // destination mmsi
+     uint32 designated_area_code = 4; // based on mid http://www.itu.int/online/mms/glad/cga_mids.sh?lng=E
+     uint32 function_id = 5;
+     bytes application_data = 8; // app bin data must be 115 bytes
+     int32 app_data_size = 9; // in bits
+}
+
+// message 26
+message M1371_MultiSlotBinary {
+}
+
+// message 27
+message M1371_LongRangePosition {
+     bool position_accuracy = 1;
+     bool raim_flag = 2; // true if RAIM is in use
+     uint32 navigational_status = 3; // 0 to 15
+     double longitude = 4; // +/-180, 181 is NA, in 1/10 min
+     double latitude = 5; // +/-90, 91 is NA, in 1/10 min
+     uint32 speed_over_ground = 6; // knot, 0 to 62, 63 is NA
+     uint32 course_over_ground = 7; // degree, 0 to 359, 360 is NA
+     bool position_latency = 8; // true if lag > 5 sec
+     bytes spare = 9; // spare bits, should be zero
+     int32 spare_size = 10; // [default = 1]; // int bits
+}
+
+

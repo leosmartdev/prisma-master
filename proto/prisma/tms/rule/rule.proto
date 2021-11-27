@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package prisma.tms.rule;
+
+import "prisma/tms/target_track.proto";
+import "prisma/tms/feature.proto";
+import "prisma/tms/moc/zone.proto";
+import "prisma/tms/moc/notice.proto";
+
+enum OperandType {
+    TRACK = 0;
+    TARGET = 1;
+    ZONE = 2;
+}
+
+message Rule {
+    string id = 1;
+    string name = 2;
+    string stage = 3;
+    State state = 4;
+    IfAny any = 20;
+    IfAll all = 21;
+    ThenNotice notice = 30;
+    ThenForward forward = 36;
+    ThenFeature feature = 31;
+    ThenRecord record = 32;
+    bool ignore = 33;
+    // if
+    message IfAny {
+        OperandType operandType = 1;
+        Operation operation = 2;
+        Track track = 20;
+        Target target = 21;
+        moc.Zone zone = 22;
+        IfAny any = 23;
+        IfAll all = 24;
+        repeated string checkFields = 25;
+    }
+    message IfAll {
+        OperandType operandType = 1;
+        Operation operation = 2;
+        Track track = 20;
+        Target target = 21;
+        moc.Zone zone = 22;
+        IfAny any = 23;
+        IfAll all = 24;
+        repeated string checkFields = 25;
+    }
+    // then
+    message ThenNotice {
+        string action = 1;
+        moc.Notice notice = 2;
+    }
+    message ThenForward {
+        repeated string dc = 2;
+    }
+    message ThenFeature {
+        string action = 1;
+        Feature feature = 2;
+    }
+    message ThenRecord {
+        string action = 1;
+        oneof payload {
+            Track track = 20;
+            Target target = 21;
+            moc.Zone zone = 22;
+            moc.Notice notice = 23;
+            Feature feature = 24;
+        }
+    }
+    // enum
+    enum Operation {
+        nonoperation = 0;
+        EQUAL = 1;
+        NOT_EQUAL = 2;
+        NEAR = 3;
+        FAR = 4;
+        TOWARD = 5;
+        AWAY = 6;
+        IN = 7;
+        OUT = 8;
+        EXIST = 9;
+        NOT_EXIST = 10;
+        GREATER = 11;
+        GREATER_EQUAL = 12;
+        LESSER = 13;
+        LESSER_EQUAL = 14;
+        REGEX = 15;
+    }
+    enum State {
+        nonstate = 0;
+        Inactive = 1;
+        ActiveSimulation = 2;
+        ActiveProduction = 3;
+        Deleted = 4;
+    }
+    enum Action {
+        nonaction = 0;
+        CREATE = 1;
+        READ = 2;
+        UPDATE = 3;
+        DELETE = 4;
+        DEPLOY_SIMULATION = 5;
+        DEPLOY_PRODUCTION = 6;
+        UNDEPLOY = 7;
+    }
+}

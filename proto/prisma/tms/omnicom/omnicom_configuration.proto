@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package prisma.tms.omnicom;
+
+message OmnicomConfiguration {
+    string zoneId = 1;
+    uint32 positionReportingInterval = 2;
+    bool activated = 3; 
+    Priority priority = 4;
+    float SpeedThreshold = 5;
+    
+	Action action = 10;
+	
+	enum Action {
+        NoAction = 0; // not used, zero is considered not set
+        UnitIntervalChange = 1;
+        RequestGlobalParameters = 2;
+		AckAssistanceAlert = 3;
+		UploadGeofence = 4;
+        RequestLastPositionRecorded = 5;
+        RequestNewPositionAquisition = 6;
+        RequestAlertReport = 7;
+        DeleteGeofence = 9;
+        TestModeAck = 10;
+        SplitPacketMessage = 11;
+    }
+    enum Priority {
+        High = 0;
+        Middle = 1;
+        Low = 2;
+    }
+}

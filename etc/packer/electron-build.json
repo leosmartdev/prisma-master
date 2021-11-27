@@ -1,0 +1,38 @@
+{
+  "builders": [
+    {
+      "type": "docker",
+      "image": "electronuserland/builder:wine",
+      "export_path": "image.tar"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "apt-get update",
+        "apt-get install -yq vim build-essential python-minimal git curl sudo locales rsyslog xvfb libgtk2.0-0 libxtst6 libxss1 gconf2 libnss3 libasound2 scons libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev cmake zlib1g-dev zip unzip autoconf automake libtool software-properties-common"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt",
+        "curl --silent -O -L https://github.com/google/protobuf/archive/v3.5.1.tar.gz",
+        "tar xf v3*.tar.gz",
+        "cd protobuf*",
+        "./autogen.sh",
+        "./configure",
+        "make install",
+        "ldconfig"
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "docker-import",
+      "repository": "orolia/electron-build",
+      "tag": "latest"
+    }
+  ]
+}

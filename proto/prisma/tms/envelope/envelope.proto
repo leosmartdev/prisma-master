@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package prisma.tms.envelope;
+
+import "prisma/tms/moc/fleet.proto";
+import "prisma/tms/moc/incident.proto";
+import "prisma/tms/moc/notice.proto";
+import "prisma/tms/moc/zone.proto";
+import "prisma/tms/moc/geojson.proto";
+import "prisma/tms/security/message/audit.proto";
+import "prisma/tms/security/message/user.proto";
+import "prisma/tms/security/message/session.proto";
+import "prisma/tms/activity_multicast.proto";
+import "prisma/tms/moc/sit915.proto";
+
+message Envelope {
+    string type = 1;
+    // sessionId of source
+    string source = 2;
+    oneof Contents {
+        prisma.tms.security.message.AuditRecord record = 11;
+        prisma.tms.moc.Fleet fleet = 12;
+        prisma.tms.moc.Incident incident = 13;
+        prisma.tms.moc.Notice notice = 16;
+        prisma.tms.security.message.User user = 14;
+        prisma.tms.moc.Zone zone = 15;
+        prisma.tms.security.message.Session session = 17;
+        prisma.tms.Transmission transmission = 18;
+        prisma.tms.moc.Vessel vessel = 19;
+        prisma.tms.moc.Device device = 20;
+        prisma.tms.moc.IncidentLogEntry note = 21;
+        prisma.tms.moc.GeoJsonFeaturePoint marker = 22;
+        prisma.tms.moc.Sit915 sit915 = 23;
+    }
+}

@@ -1,0 +1,173 @@
+#!/bin/bash
+#sudo su
+set -e -x
+
+# Mongo repository
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
+cp /vagrant/vagrant/services/mongodb/mongo.list /etc/apt/sources.list.d/mongodb-org-3.6.list
+
+# System dependencies
+apt-get update
+apt-get install -y \
+    build-essential \
+    git \
+    python-minimal \
+    python3-pip \
+    mongodb-org \
+    vsftpd \
+    apache2-utils \
+    libpam-pwdfile \
+	libfontconfig1 \
+	libxrender1 \
+    unzip \
+    graphviz \
+    mkdocs \
+    libcairo2 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info
+
+# Documentation generator for markdown files is mkdocs above
+# From libcairo2 to shared-mime-info are deps for creating pdf documentation in mkdocs required
+# by mkdocs-pdf-export-plugin installed by pip below.
+
+( \
+    cd /opt ; \
+    curl --silent -O -L https://dl.google.com/go/go1.15.5.linux-amd64.tar.gz ; \
+    tar xf go*.tar.gz \
+)
+( \
+    cd /opt ; \
+    curl --silent -O -L https://github.com/google/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip ; \
+    mkdir /opt/protoc ; \
+    cd /opt/protoc ; \
+    unzip ../protoc*.zip ; \
+    find /opt/protoc -type d -exec chmod 755 {} \; ;\
+    find /opt/protoc -type f -exec chmod 644 {} \; ;\
+    chmod 755 /opt/protoc/bin/protoc ; \
+ )
+( \
+	cd /opt ; \
+	curl --silent -O -L https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz ; \
+	tar xpvf wkhtmlto*.tar.xz ; \
+	mv wkhtmltox /opt/wkhtmltopdf ; \
+	cd /opt/wkhtmltopdf ; \
+	find /opt/wkhtmltopdf -type d -exec chmod 755 {} \; ;\
+  find /opt/wkhtmltopdf -type f -exec chmod 644 {} \; ;\
+	chmod 755 /opt/wkhtmltopdf/bin/wkhtmltopdf ; \
+)
+( \
+    cd /opt ; \
+    curl --silent -O -L https://releases.hashicorp.com/consul/1.0.7/consul_1.0.7_linux_amd64.zip ; \
+    unzip consul*.zip ; \
+    mv consul /usr/local/bin
+)
+
+# install redis
+wget http://download.redis.io/releases/redis-4.0.9.tar.gz
+tar xzf redis-4.0.9.tar.gz
+( cd redis-4.0.9 && make && make install)
+rm -rf redis-4.0.9
+
+# Config and runtime files
+cp /vagrant/vagrant/tms-dev.sh /etc/profile.d
+cp /vagrant/vagrant/go.sh /etc/profile.d
+cp /vagrant/vagrant/protoc.sh /etc/profile.d
+cp /vagrant/vagrant/wkhtmltopdf.sh /etc/profile.d
+install -o vagrant -g vagrant -d /etc/trident
+install -o vagrant -g vagrant -d /etc/trident/db
+install -o vagrant -g vagrant -d /etc/redis
+install -o vagrant -g vagrant -d /var/lib/redis
+install -o mongodb -g mongodb -d /var/trident/db
+install -o vagrant -g vagrant -d /var/trident/db-it
+install -o vagrant -g vagrant /vagrant/vagrant/tmsd.conf /etc/trident/tmsd.conf
+install -o vagrant -g vagrant /vagrant/vagrant/sites.js /etc/trident/sites.js
+install -o vagrant -g vagrant /vagrant/vagrant/sit185-template.json /etc/trident/sit185-template.json
+install -o vagrant -g vagrant /vagrant/vagrant/00-tmsd.conf /etc/rsyslog.d/00-tmsd.conf
+install -o vagrant -g vagrant /vagrant/etc/tls/intermediate/certs/localhost-ca-chain.cert.pem /etc/trident/certificate.pem
+install -o vagrant -g vagrant /vagrant/etc/tls/intermediate/private/localhost.key.pem /etc/trident/key.pem
+install -o vagrant -g vagrant /vagrant/vagrant/services/redis/redis.service /lib/systemd/system/redis.service
+install -o vagrant -g vagrant /vagrant/vagrant/services/redis/redis.conf /etc/redis/redis.conf
+install -o vagrant -g vagrant /vagrant/etc/reports/incident-processing-form.html /etc/trident/incident-processing-form.html
+
+# trust McMurdo Development CA
+sudo cp /vagrant/etc/tls/certs/ca.cert.pem /usr/local/share/ca-certificates/ca.crt
+sudo update-ca-certificates
+
+# FTP configs for MCC
+install /vagrant/vagrant/vsftpd.conf /etc/vsftpd.conf
+install /vagrant/vagrant/vsftpd.pam /etc/pam.d/vsftpd
+install -o vagrant -g vagrant /vagrant/vagrant/vsftpd.passwd /etc/trident/vsftpd.passwd
+install -o vagrant -g vagrant -d /srv/ftp/test
+
+# EJDB repository
+wget https://prisma-c2.s3.amazonaws.com/dependencies/all-dependencies/ejdb_1.2.12-ppa1~xenial1_amd64.deb
+dpkg -i ejdb_1.2.12-ppa1~xenial1_amd64.deb
+
+# Batam dataset
+curl -s -O https://s3.amazonaws.com/prisma-data/tplayd/trident-data-batam_1-2_all.deb
+dpkg -i trident-data-batam*.deb
+
+# Acceptance test requirements
+pip3 install -r /vagrant/tests/acceptance/requirements.txt
+pip3 install -r /vagrant/tms/cmd/tools/tdemo/requirements.txt
+
+# Documentation static site theme
+#pip3 install mkdocs-material
+#pip3 install pymdown-extensions
+#pip3 install mkdocs-pdf-export-plugin
+
+# Initial TMS software build
+sudo -u vagrant -i -- <<EOF
+mkdir -p ~/go/src
+if [ ! -e ~/go/src/prisma ] ; then
+    ln -s /vagrant ~/go/src/prisma
+fi
+cd ~/go/src/prisma
+echo export GO111MODULE=on >> ~/.bashrc
+source ~/.bashrc
+export GO111MODULE=on
+make init protobuf compile
+EOF
+
+install -o vagrant -g vagrant /home/vagrant/go/src/prisma/etc/mongodb/mongod.conf /etc/mongod.conf
+
+# Link mongodb scripts and install
+mkdir -p /usr/share/tms-db/mongo
+ln -s /vagrant/etc/mongodb/schema /usr/share/tms-db/mongo/schema
+ln -s /vagrant/etc/mongodb/loaders /usr/share/tms-db/mongo/loaders
+cp /vagrant/etc/mongodb/*.js  /etc/trident/db/
+
+# tests
+install -o vagrant -g vagrant -d /opt/prisma/tests
+ln -s /vagrant/tests/acceptance /opt/prisma/tests/acceptance
+
+# Restart modified services
+systemctl daemon-reload
+systemctl enable mongod
+systemctl restart mongod
+systemctl enable redis
+systemctl restart vsftpd.service
+systemctl restart rsyslog.service
+systemctl start redis &
+
+# Install schema
+sleep 10s
+mongo localhost:27017 /etc/trident/db/replication.js
+sleep 5s
+mongo localhost:27017/trident /usr/share/tms-db/mongo/schema/trident.js
+if ! mongo localhost:27017/trident --eval "db.tracks.getIndexes().length > 1" ; then
+    echo "==== Fail schema validation"
+    exit -1
+fi
+sleep 5s
+mongo localhost:27017/aaa /usr/share/tms-db/mongo/schema/aaa.js
+if ! mongo localhost:27017/aaa --eval "db.users.getIndexes().length > 1" ; then
+    echo "==== Fail schema validation"
+    exit -1
+fi
+
+# start in prisma
+echo "cd ~/go/src/prisma" >> ~/.bashrc

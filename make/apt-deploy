@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e 
+
+. /etc/lsb-release
+
+PROG=$(basename "$0")
+REPO_BASE=/mnt/tsi_shared/apt_repo/freight/apt
+
+usage() {
+    cat <<EOF
+Usage: $PROG <repo> <deb-file>...
+EOF
+}
+
+if [ $# -lt 2 ] ; then
+    usage
+    exit 1
+fi
+
+REPO=$1
+shift
+
+REPO_DIR="$REPO_BASE/$DISTRIB_CODENAME/$REPO"
+if [ ! -d "$REPO_DIR" ] ; then
+    echo "$PROG: No such repository directory: $REPO_DIR" 2>&1
+    exit 1
+fi
+
+for DEB in $@ ; do
+    HEAD=$(basename $DEB | cut -f1 -d_)
+    if [ "$REPO" != "release" ] ; then
+        rm -f $REPO_DIR/${HEAD}_*.deb
+    fi
+    freight add $DEB apt/${DISTRIB_CODENAME}/${REPO}
+done
+
+freight cache
+
+

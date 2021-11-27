@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package prisma.tms.client_api;
+
+message AssignRequest {
+    string type = 2;
+    string lookup = 3;
+    string label = 4;
+    string fleet_id = 5;
+}
+
+message AssignResponse {
+    string registry_id = 1;
+}
+
+message UnassignRequest {
+    string registry_id = 1;
+}
+
+message UnassignResponse {
+    string registry_id = 1;
+    bool ok = 2;
+}

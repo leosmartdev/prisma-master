@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+BASEDIR=$(dirname "$0")/..
+[ $GOBIN ] || GOBIN=$GOPATH/bin
+DST=$1
+
+mkdir -p $DST/usr/bin
+mkdir -p $DST/usr/sbin
+mkdir -p $DST/etc/trident
+
+cp $GOBIN/tanalyzed               $DST/usr/sbin/tanalyzed
+cp $GOBIN/tdatabased              $DST/usr/sbin/tdatabased
+cp $GOBIN/tfleetd                 $DST/usr/sbin/tfleetd
+cp $GOBIN/tmsd                    $DST/usr/sbin/tmsd
+cp $GOBIN/tnoid                   $DST/usr/sbin/tnoid
+cp $GOBIN/treportd                $DST/usr/sbin/treportd
+cp $GOBIN/twatch                  $DST/usr/bin/twatch
+cp $GOBIN/tping                   $DST/usr/bin/tping
+cp $GOBIN/twebd                   $DST/usr/sbin/twebd
+cp $GOBIN/tgwad                   $DST/usr/sbin/tgwad
+cp $GOBIN/torbcommd               $DST/usr/sbin/torbcommd
+cp $GOBIN/tnafexportd             $DST/usr/sbin/tnafexportd
+cp $GOBIN/tauthd                  $DST/usr/sbin/tauthd
+cp $GOBIN/tselfsign               $DST/usr/bin/tselfsign
+cp $GOBIN/tspiderd                $DST/usr/sbin/tspiderd
+cp $GOBIN/tadsbd                  $DST/usr/sbin/tadsbd 
+cp $GOBIN/tvtsd                   $DST/usr/sbin/tvtsd 
+cp $BASEDIR/etc/reports/incident-processing-form.html $DST/etc/trident/incident-processing-form.html

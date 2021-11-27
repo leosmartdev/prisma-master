@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package prisma.tms;
+option java_package="com.technosci.tms.message";
+
+message RuleInfo {
+    string id = 1;
+    string stateA = 2;
+    string stateB = 3;
+}

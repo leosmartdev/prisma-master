@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package prisma.tms.rest;
+
+message Service {
+
+    message MAP {
+        string base = 1;
+    }
+
+    MAP map = 5;
+
+    message WS {
+        string map = 1;
+        string tms = 2;
+    }
+
+    WS ws = 4;
+
+    message TMS {
+        HEADERS headers = 1;
+        string base = 2;
+        string device = 3;
+        string fleet = 4;
+        string track = 5;
+        string incident = 6;
+        string communication = 7;
+        string notification = 8;
+        string vessel = 9;
+        string registry = 10;
+        string rule = 11;
+        string map = 12;
+        string zone = 13;
+        string file = 14;
+        string pagination = 15;
+        string swagger = 16;
+        string activity = 17;
+        string request = 18;
+    }
+
+    TMS tms = 1;
+
+    message AAA {
+        HEADERS headers = 1;
+        string base = 2;
+        string session = 3;
+        string user = 4;
+        string role = 5;
+        string policy = 6;
+        string profile = 7;
+        string audit = 8;
+        string pagination = 9;
+        string swagger = 10;
+    }
+
+    AAA aaa = 2;
+
+    message SIM {
+        HEADERS headers = 1;
+        string alert = 2;
+        string target = 3;
+        string route = 4;
+        string swagger = 5;
+    }
+
+    SIM sim = 3;
+
+    message HEADERS {
+        string apiKey = 1;
+    }
+}

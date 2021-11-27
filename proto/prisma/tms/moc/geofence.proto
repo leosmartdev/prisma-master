@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+message GeoFence {
+    string database_id = 1;
+}

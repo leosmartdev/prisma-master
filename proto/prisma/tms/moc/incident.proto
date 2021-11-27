@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "prisma/tms/moc/file.proto";
+import "prisma/tms/moc/entityrelationship.proto";
+import "google/protobuf/timestamp.proto";
+import "prisma/tms/moc/track.proto";
+
+message Incident {
+    string id = 1;
+    string incidentId = 2;
+    string name = 3;
+    string type = 4;
+    IncidentPhase phase = 5;
+    string commander = 6;
+    State state = 7;
+    string assignee = 8;
+    string outcome = 9;
+    string synopsis = 10;
+    repeated IncidentLogEntry log = 100;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        CLOSE = 4;
+        OPEN = 5;
+        ASSIGN = 6;
+        UNASSIGN = 7;
+        ARCHIVE = 8;
+        ADD_NOTE = 9;
+        ADD_NOTE_FILE = 10;
+        ADD_NOTE_ENTITY = 11;
+        DELETE_NOTE = 12;
+        TRANSFER_SEND = 13;
+        TRANSFER_RECEIVE = 14;
+        TRANSFER_FAIL = 15;
+        REOPEN = 16;
+        DETACH_NOTE = 17;
+    }
+    enum State {
+        // not used, zero is considered not set
+        nonstate = 0;
+        Open = 1;
+        Closed = 2;
+        Archived = 3;
+        Transferring = 4;
+        Transferred = 5;
+    }
+}
+
+message IncidentLogEntry {
+    string id = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    string type = 3;
+    string note = 4;
+    FileMetadata attachment = 5;
+    EntityRelationship entity = 6;
+    bool important = 7;
+    bool deleted = 8;
+    bool target = 9;
+    Track track = 10;
+    bool assigned = 11;
+    enum Action {
+        CREATE = 0;
+        READ = 1;
+        UPDATE = 2;
+        DELETE = 3;
+        ASSIGN = 4;
+        ADD_FILE = 5;
+    }
+}
+
+// to get the incident info when getting an assined note
+message IncidentLogEntryResponse {
+    IncidentLogEntry note = 1;
+    Incident incident = 2;
+}
+
+enum IncidentPhase {
+    // not used, zero is considered not set
+    nonphase = 0;
+    Uncertainty = 1;
+    Alert = 2;
+    Distress = 3;
+}

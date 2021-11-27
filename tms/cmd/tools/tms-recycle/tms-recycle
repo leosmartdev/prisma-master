@@ -1,0 +1,54 @@
+#!/bin/bash
+
+CONFIG="/etc/trident/tmsd.conf"
+REBUILD=false
+for i in "$@"
+do
+case $i in
+    --rebuild)
+    REBUILD=true
+    shift
+    ;;
+    -c=*|--config=*)
+    CONFIG="${i#*=}"
+    shift
+    ;;
+    -h|--help)
+    echo "$0 is used to clean environment and re-run tms"
+    echo "--rebuild - allows to rebuild daemons of tms"
+    echo "-c=* or --config=* - allows to re-run tms with specific config"
+    exit 0
+    ;;
+esac
+done
+
+echo "==== Stop"
+tmsd --stop
+
+if $REBUILD ; then
+    echo "===== Rebuilding"
+    ( cd ~/go/src/prisma ; make clean protobuf all )
+fi
+
+echo "==== Clear database"
+redis-cli flushall
+sudo systemctl stop mongod
+sudo rm -rf /var/trident/db/*
+sudo systemctl start mongod
+sleep 5s
+mongo localhost:27017 /etc/trident/db/replication.js
+sleep 5s
+mongo localhost:27017/trident /usr/share/tms-db/mongo/schema/trident.js
+if ! mongo localhost:27017/trident --eval "db.tracks.getIndexes().length > 1" ; then
+    echo "==== Fail schema validation"
+    exit -1
+fi
+sleep 5s
+mongo localhost:27017/aaa /usr/share/tms-db/mongo/schema/aaa.js
+if ! mongo localhost:27017/aaa --eval "db.users.getIndexes().length > 1" ; then
+    echo "==== Fail schema validation"
+    exit -1
+fi
+echo "==== Start"
+
+tmsd --start -config $CONFIG &

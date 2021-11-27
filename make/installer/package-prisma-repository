@@ -1,0 +1,48 @@
+#! /bin/bash
+
+VERSION=$1
+DIST=./dist/PRISMA_Server_Install
+
+RED="\033[0;31m";
+GREEN="\033[0;32m";
+BLUE="\033[0;34m";
+NC="\033[0m";
+
+if [ "$VERSION" == "" ]; then
+  echo -e "${RED}Version is required.${NC}\nusage: ./package-prisma-repository <version>";
+  exit
+fi
+
+echo -e "${BLUE}Updating repository...${NC}";
+sh ./update-prisma-repository
+echo -e "${GREEN}DONE${NC}";
+
+echo -e -n "\n${BLUE}Cleaning old build...${NC}";
+rm -rf ./dist
+mkdir -p $DIST
+echo -e "${GREEN}DONE${NC}";
+
+echo -e -n "${BLUE}Copying repository...${NC}"
+cd $DIST
+#tar -czf prisma-repo-$1.tar.gz /usr/local/prisma-repository
+cp -R /usr/local/prisma-repository ./
+cd ../../
+echo -e "${GREEN}DONE${NC}";
+
+echo -e -n "${BLUE}Copying files and configurations...${NC}"
+cp update-prisma-repository $DIST/
+cp install.sh $DIST/
+cp prisma $DIST/
+cp prisma.list $DIST/
+echo -e "${GREEN}DONE${NC}";
+
+echo -e -n "${BLUE}Creating installer tarball...${NC}"
+cd ./dist
+tar -czf PRISMA_Server_Install.tar.gz PRISMA_Server_Install
+cat ../extract.sh PRISMA_Server_Install.tar.gz > PRISMA_Server_Install-$1
+chmod +x PRISMA_Server_Install-$1
+rm PRISMA_Server_Install.tar.gz
+cd ../../
+echo -e "${GREEN}DONE${NC}";
+
+echo -e "\n${GREEN}WROTE ./dist/PRISMA_Server_Install-$1${NC}";

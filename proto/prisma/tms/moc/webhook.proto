@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+message GitLabEventMergeRequest {
+    GitLabObjectAttributes object_attributes = 1;
+}
+
+message GitLabObjectAttributes {
+    string state = 1;
+}
+
+message AWSPipelineExecution {
+    string pipelineExecutionId = 1;
+}

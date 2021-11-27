@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+import "prisma/tms/common.proto";
+import "prisma/tms/moc/fleet.proto";    
+import "prisma/tms/moc/entityrelationship.proto";
+
+message Area {
+    double radius = 1;
+    string track_id = 2;
+    string registry_id = 3;
+    prisma.tms.Point center = 4;
+}
+
+message Elevation {
+    double base = 1;
+    double top = 2;
+}
+
+message Zone {
+    string database_id = 1;
+    Action action = 2;
+    string name = 3;
+    string description = 4;
+    prisma.tms.Color fill_color = 5;
+    string fill_pattern = 6;
+    prisma.tms.Color stroke_color = 7;
+    prisma.tms.Polygon poly = 8;
+    Area area = 9;
+    Elevation elevation = 10;
+    // here will be contained an array of id's for excluded vessels
+    repeated Vessel excludedVessels = 11;
+
+    // Rules
+    bool create_alert_on_enter = 12;
+    bool create_alert_on_exit = 13;
+
+    // Entity relationship
+    repeated EntityRelationship entities = 14;
+
+    enum Action {
+        UPDATE = 0;
+        DELETE = 1;
+        READ = 2;
+    }
+    //zone_id gets created authomatically when a new zone is create in the system
+	//this fields is the mapping between omnicom beaon's GEO_ID and C2 Zones
+	uint32 zone_id = 15;
+}
+
+message Entities {
+    repeated EntityRelationship entities = 1; 
+}

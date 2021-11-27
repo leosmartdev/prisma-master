@@ -1,0 +1,8 @@
+Package: tms
+Version: @VERSION@-@DEBIAN_REVISION@.@TIMESTAMP@.git@COMMIT@
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: Orolia
+Depends: ejdb, consul (>= 1.0.7), redis (>= 4.0.9), wkhtmltox (=0.12.1), xvfb, libfontconfig1
+Description: TMS - Core Components

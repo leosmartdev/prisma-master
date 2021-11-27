@@ -1,0 +1,13 @@
+[Unit]
+Description=Mongo Database
+After=syslog.target network.target
+Before=tms.service
+
+[Service]
+Type=simple
+User=vagrant
+Group=vagrant
+ExecStart=/usr/bin/mongod --syslog --dbpath /var/trident/db --port 27017 --bind_ip_all --replSet replocal 
+
+[Install]
+WantedBy=multi-user.target

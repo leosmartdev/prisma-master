@@ -1,0 +1,67 @@
+- Debug backend
+  * Use log.Debug(msgStr) function to log a msgStr.
+  * All the logs are logged in /var/log/tmsd.log file.
+  * To see the logs on the shell in real time, set "-stdlog -log debug" flag after daemon name in /etc/trident/tmsd.conf.
+    Afterthat start the tmsd service by the command: "tmsd -stdlog -log debug --start &"
+
+- Debug frontend
+  * Just use the console.error() function to log.
+
+- SocketIO implementation
+  * In the backend, use prisma/tms/ws.Publisher object. envelop protobuf message is used for passing data.
+    i.e. prisma\tms\cmd\daemons\tanalyzed\sit915.go: Line 426.
+  * In the frontend, the passed message is captured packages\prisma-electron\src\session\session.js.
+    i.e. prisma-ui\packages\prisma-electron\src\session\session.js: Line 153.
+
+- OpenLayers Map implementation
+  * Once the updated information for a map feature through /view/stream SocketIO channel, it will be processed in prisma-ui\packages\prisma-electron\src\components\map\openlayers\OpenLayersMap.js(Line 313)
+  * It uses featureUpdate function which updates the feature's status on the map in prisma-ui\packages\prisma-electron\src\components\map\openlayers\Dispatcher.js.
+  * Each type of tracks has their own layers and they're registered to the dispatcher.(OpenLayersMap.js: Line 173)
+  * The detailed configuration for the tracks are listed in prisma-ui\packages\prisma-electron\src\components\map\openlayers\layers folder.
+
+- Upgarde to Material-UI 5
+  * Follow the guidance(https://mui.com/guides/migration-v4/)
+  * We should manually find the modules to be updated step by step.
+  * On Github, develop and army branches are the different main branches. So we should update them separately.
+
+- Communication between daemons using tgwad
+  * The sending part packs the protobuf message and send it to tgwad.
+    i.e. tms\cmd\daemons\twebd\public\note.go: Line 621 (army)
+  * Listening part listens to tgwad. Once the wanted protobuf message is sent to the tgwad, all the listeners receive it.
+    i.e. tms\cmd\daemons\twebd\public\note.go: Line 648 (army)
+
+- When the library not found error occurs as building in the frontend
+  * Run "yarn install"
+
+- MongoDB watcher
+  * The watcher watches the MongoDB collection and get the updated document once it is updated.
+    i.e. tms\cmd\daemons\tanalyzed\sit915.go: Line 51
+
+- After creating a new API
+  * Should add the URI to the whitelist.(prisma\tms\security\service\Filter.go)
+
+- Permissions
+  * All the permissions are listed in prisma\tms\security\Permission.go
+
+############### Shells ###############
+- Backend
+  * After updating protobuf:
+    make protobuf
+  * After updating modules:
+    make
+  * Start daemons
+    tmsd --start &
+  * Check the daemons' status
+    tmsd --info
+  * Check the used ports
+    netstat -ntlp
+
+- Frontend
+  * Build
+    yarn build --watch
+  * Start
+    yarn start:local --ignore-certificate-errors
+  * Install new library
+    yarn add lib
+  * Get the library updates
+    yarn install

@@ -390,6 +390,14 @@ func (a *RouteAuthorizer) Authorize(request *restful.Request, response *restful.
 				sec.Audit(request.Request.Context(), sec.CLASSIDSit915, "ANY", "FAIL", routePath)
 			}
 		}
+		// mapconfig
+		if strings.HasSuffix(routePath, "/mapconfig") ||
+			strings.HasSuffix(routePath, "/mapconfig/set") {
+			allowed = sec.HasPermissionForClass(request.Request.Context(), "MapConfig")
+			if !allowed {
+				sec.Audit(request.Request.Context(), "MapConfig", "ANY", "FAIL", routePath)
+			}
+		}
 		// message
 		if strings.HasSuffix(routePath, "/message") {
 			allowed = sec.HasPermissionForClass(request.Request.Context(), sec.CLASSIDMessage)

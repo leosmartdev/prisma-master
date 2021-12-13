@@ -89,6 +89,10 @@ var (
 			Name: "sit915",
 			Inst: moc.Sit915{},
 		},
+		{
+			Name: "mapconfig",
+			Inst: moc.MapConfig{},
+		},
 	})
 
 	MiscIndexes = []Index{

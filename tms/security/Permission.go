@@ -31,6 +31,7 @@ const (
 	CLASSIDRemoteSite = "RemoteSite"
 	CLASSIDSit915     = "Sit915"
 	CLASSIDMessage    = "Message"
+	MAPCONFIG_CLASSID = "MapConfig"
 )
 
 var (
@@ -238,6 +239,12 @@ var Permissions_StandardUser = []*message.Permission{
 		ClassId: "Search",
 		Actions: []string{"READ"},
 	},
+	{
+		ClassId: MAPCONFIG_CLASSID,
+		Actions: []string{
+			moc.MapConfig_GET.String(),
+		},
+	},
 }
 
 var Permissions_FleetManager = []*message.Permission{
@@ -413,6 +420,14 @@ var Permissions_IncidentManager = []*message.Permission{
 		ClassId: CLASSIDMessage,
 		Actions: []string{
 			sar.SarsatMessage_READ.String(),
+		},
+	},
+	{
+		ClassId: MAPCONFIG_CLASSID,
+		Actions: []string{
+			moc.MapConfig_GET.String(),
+			moc.MapConfig_DELETE.String(),
+			moc.MapConfig_UPDATE.String(),
 		},
 	},
 }
@@ -624,6 +639,14 @@ var Permissions_Administrator = []*message.Permission{
 		ClassId: CLASSIDMessage,
 		Actions: []string{
 			sar.SarsatMessage_READ.String(),
+		},
+	},
+	{
+		ClassId: MAPCONFIG_CLASSID,
+		Actions: []string{
+			moc.MapConfig_GET.String(),
+			moc.MapConfig_DELETE.String(),
+			moc.MapConfig_UPDATE.String(),
 		},
 	},
 }

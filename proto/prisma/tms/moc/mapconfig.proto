@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+// import "google/protobuf/any.proto";
+
+message MapConfig {
+    string id = 1;
+    string key = 2;
+    // google.protobuf.Any value = 3;
+    TrackTimeout value = 3;
+    enum Action {
+        GET = 0;
+        UPDATE = 1;
+        DELETE = 2;
+    }
+}
+
+message TrackTimeout {
+    uint32 adsb = 1;
+    uint32 ais = 2;
+    uint32 manual = 3;
+    uint32 marker = 4;
+    uint32 omnicom = 5;
+    uint32 radar = 6;
+    uint32 sarsat = 7;
+    uint32 sart = 8;
+    uint32 spidertrack = 9;
+    uint32 unknown = 10;
+}

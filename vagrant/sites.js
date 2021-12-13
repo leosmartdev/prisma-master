@@ -3,7 +3,7 @@ sites = [
         "siteid" : 1, 
         "type" : "MRCC", 
         "name" : "Vagrant", 
-        "description" : "This site is local site for dev enviroment", 
+        "description" : "This site is local site for dev environment", 
         "address" : "localhost:31228", 
         "country" : "Null Island", 
         "point" : { 

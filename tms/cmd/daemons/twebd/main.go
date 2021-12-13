@@ -762,6 +762,19 @@ func main() {
 			Param(webService.QueryParameter("direction", "Message direction (0:ALL | 1:SENT | 2:RECEIVED)")).
 			Writes([]public.MessageResponse{}).
 			Returns(http.StatusOK, "OK", []public.MessageResponse{}))
+		// MapConfig service
+		mapconfigRest := public.NewMapConfigRest(ctxt, mongoClient)
+		webService.Route(webService.GET("/mapconfig").To(mapconfigRest.ReadAll).
+			Doc("get map config").
+			Metadata(restfulspec.KeyOpenAPITags, []string{"mapconfig"}).
+			Writes(moc.MapConfig{}).
+			Returns(http.StatusOK, "OK", []moc.MapConfig{}))
+		webService.Route(webService.POST("/mapconfig/set").To(mapconfigRest.SetSetting).
+			Doc("set map config setting").
+			Metadata(restfulspec.KeyOpenAPITags, []string{"mapconfig"}).
+			ReadsWithSchema(moc.MapConfig{}, public.SCHEMA_MAP_CONFIG).
+			Writes(moc.MapConfig{}).
+			Returns(http.StatusCreated, "OK", moc.MapConfig{}))
 
 		// add to container
 		container.Add(webService)

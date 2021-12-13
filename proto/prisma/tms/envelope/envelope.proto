@@ -12,6 +12,7 @@ import "prisma/tms/security/message/user.proto";
 import "prisma/tms/security/message/session.proto";
 import "prisma/tms/activity_multicast.proto";
 import "prisma/tms/moc/sit915.proto";
+import "prisma/tms/moc/mapconfig.proto";
 
 message Envelope {
     string type = 1;
@@ -31,5 +32,6 @@ message Envelope {
         prisma.tms.moc.IncidentLogEntry note = 21;
         prisma.tms.moc.GeoJsonFeaturePoint marker = 22;
         prisma.tms.moc.Sit915 sit915 = 23;
+        prisma.tms.moc.MapConfig mapconfig = 24;
     }
 }

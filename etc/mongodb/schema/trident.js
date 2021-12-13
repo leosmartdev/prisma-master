@@ -136,3 +136,9 @@ ldb.tracks.createIndex({registry_id: 1},{
 ldb.createCollection("zones");
 
 ldb.createCollection("sit915");
+
+ldb.createCollection("mapconfig");
+ldb.mapconfig.createIndex({"key": 1}, {
+    name: "mapconfigKey",
+    unique: true
+});

@@ -10,6 +10,7 @@ import (
 	"prisma/tms/debug"
 	"prisma/tms/devices"
 	"prisma/tms/log"
+	"prisma/tms/moc"
 	"prisma/tms/routing"
 	"prisma/tms/tmsg"
 	client "prisma/tms/tmsg/client"
@@ -51,20 +52,22 @@ import (
 // expired tracks and then the initial state is loaded.
 
 type trackExtenderStage struct {
-	ctxt      gogroup.GoGroup
-	db        db.TrackExDb
-	trackDb   db.TrackDB
-	watching  map[string]tms.TrackExtension
-	mutex     sync.RWMutex
-	tracer    *log.Tracer
-	clk       clock.C
-	tsiClient client.TsiClient
+	ctxt        gogroup.GoGroup
+	db          db.TrackExDb
+	trackDb     db.TrackDB
+	mapconfigDb db.MapConfigDB // Leo: add mapconfig db
+	watching    map[string]tms.TrackExtension
+	mutex       sync.RWMutex
+	tracer      *log.Tracer
+	clk         clock.C
+	tsiClient   client.TsiClient
 
 	extensionAt time.Duration
 	timeouts    map[devices.DeviceType]time.Duration
 	watchTicker *time.Ticker
 
-	trackExReqStream <-chan *client.TMsg
+	trackExReqStream   <-chan *client.TMsg
+	trackTimeoutStream <-chan *client.TMsg // Leo
 
 	// initilized is bool variable that gets set to true when the init function is done
 	// only when initilized is true, we can analyze the stage
@@ -102,11 +105,48 @@ func (s *trackExtenderStage) init(ctxt gogroup.GoGroup, client *mongo.MongoClien
 	s.ctxt = ctxt
 	s.db = mongo.NewTrackExDb(ctxt, client)
 	s.trackDb = mongo.NewMongoTracks(ctxt, client)
+	miscDb := mongo.NewMongoMiscData(ctxt, client)
+	s.mapconfigDb = mongo.NewMongoMapConfigDb(miscDb)
+	mapconfig, err := s.mapconfigDb.FindAllMapConfig()
+
+	log.Info("MAPCONFIG START")
+
+	// for k := range s.timeouts {
+	// 	log.Info("MAPCONFIG First: timeout %+v: %+v", k, s.timeouts[k])
+	// }
+	if err == nil {
+		// timeoutMapConfig := new(moc.TrackTimeout)
+		for _, configDatum := range mapconfig {
+			if mocMapconfig, ok := configDatum.Contents.Data.(*moc.MapConfig); ok {
+				// log.Info("MAPCONFIG: KEY: %+v", mocMapconfig.Key)
+				if mocMapconfig.Key == "track_timeouts" {
+					timeouts := mocMapconfig.Value
+					// s.timeouts[devices.DeviceType_AIS] = time.Duration(timeouts.Ais) * time.Minute
+					s.timeouts[devices.DeviceType_AIS] = 5 * time.Minute
+					s.timeouts[devices.DeviceType_ADSB] = time.Duration(timeouts.Adsb) * time.Minute
+					s.timeouts[devices.DeviceType_Manual] = time.Duration(timeouts.Manual) * time.Minute
+					s.timeouts[devices.DeviceType_Marker] = time.Duration(timeouts.Marker) * time.Minute
+					s.timeouts[devices.DeviceType_OmnicomVMS] = time.Duration(timeouts.Omnicom) * time.Minute
+					s.timeouts[devices.DeviceType_OmnicomSolar] = time.Duration(timeouts.Omnicom) * time.Minute
+					s.timeouts[devices.DeviceType_Radar] = time.Duration(timeouts.Radar) * time.Minute
+					s.timeouts[devices.DeviceType_SARSAT] = time.Duration(timeouts.Sarsat) * time.Minute
+					s.timeouts[devices.DeviceType_SART] = time.Duration(timeouts.Sart) * time.Minute
+					s.timeouts[devices.DeviceType_Spidertracks] = time.Duration(timeouts.Spidertrack) * time.Minute
+					s.timeouts[devices.DeviceType_Unknown] = time.Duration(timeouts.Unknown) * time.Minute
+					break
+				}
+			}
+		}
+	}
+	for k := range s.timeouts {
+		log.Info("MAPCONFIG Final: timeout %+v: %+v", k, s.timeouts[k])
+	}
+
 	removed, err := s.db.Startup()
 	if err != nil {
 		return err
 	}
-	log.Info("%+v trackex documents removed", removed)
+	log.Info("MAPCONFIG: %+v trackex documents removed", removed)
 	prev, err := s.db.Get()
 	if err != nil {
 		return err
@@ -115,23 +155,28 @@ func (s *trackExtenderStage) init(ctxt gogroup.GoGroup, client *mongo.MongoClien
 		s.watching[ex.Track.Id] = ex
 		err := s.extend(ex)
 		if err != nil {
-			log.Error("init cannot not extend tracks %+v", err)
+			log.Error("MAPCONFIG: init cannot not extend tracks %+v", err)
 		}
 	}
 	if len(s.watching) > 0 {
-		log.Info("%v previous extensions still active", len(s.watching))
+		log.Info("MAPCONFIG: %v previous extensions still active", len(s.watching))
 	}
 	ctx := s.ctxt.Child("TrackExReq stream")
 	s.trackExReqStream = s.tsiClient.Listen(ctx, routing.Listener{
 		MessageType: "prisma.tms.TrackExReq",
+	})
+	s.trackTimeoutStream = s.tsiClient.Listen(ctx, routing.Listener{
+		MessageType: "prisma.tms.moc.TrackTimeout",
 	})
 	s.initialized = true
 	return nil
 }
 
 func (s *trackExtenderStage) start() {
+	log.Info("MAPCONFIG: Timeout, extend Listening Start")
 	go s.watch()
 	go s.extendReq()
+	go s.timeoutReq() // Leo
 }
 
 func (s *trackExtenderStage) extendReq() {
@@ -146,7 +191,7 @@ func (s *trackExtenderStage) extendReq() {
 				log.Error("Problem with TrackExReq Stream")
 				continue
 			}
-			log.Info("track extention request received %+v", report)
+			log.Info("MAPCONFIG: track extention request received %+v", report)
 			if report.Track == nil {
 				track, err := s.trackDb.GetLastTrack(bson.M{"registry_id": report.RegistryId})
 				if err != nil {
@@ -174,6 +219,35 @@ func (s *trackExtenderStage) extendReq() {
 					}
 				}
 			}
+		}
+
+	}
+}
+
+func (s *trackExtenderStage) timeoutReq() {
+	for {
+		select {
+		case <-s.ctxt.Done():
+			return
+		default:
+			tmsg := <-s.trackTimeoutStream
+			report, ok := tmsg.Body.(*moc.TrackTimeout)
+			if !ok {
+				log.Error("MAPCONFIG: Problem with TrackTimeoutReq Stream")
+				continue
+			}
+			log.Info("MAPCONFIG: track timeout request received %+v", report)
+			s.timeouts[devices.DeviceType_AIS] = time.Duration(report.Ais) * time.Minute
+			s.timeouts[devices.DeviceType_ADSB] = time.Duration(report.Adsb) * time.Minute
+			s.timeouts[devices.DeviceType_Manual] = time.Duration(report.Manual) * time.Minute
+			s.timeouts[devices.DeviceType_Marker] = time.Duration(report.Marker) * time.Minute
+			s.timeouts[devices.DeviceType_OmnicomVMS] = time.Duration(report.Omnicom) * time.Minute
+			s.timeouts[devices.DeviceType_OmnicomSolar] = time.Duration(report.Omnicom) * time.Minute
+			s.timeouts[devices.DeviceType_Radar] = time.Duration(report.Radar) * time.Minute
+			s.timeouts[devices.DeviceType_SARSAT] = time.Duration(report.Sarsat) * time.Minute
+			s.timeouts[devices.DeviceType_SART] = time.Duration(report.Sart) * time.Minute
+			s.timeouts[devices.DeviceType_Spidertracks] = time.Duration(report.Spidertrack) * time.Minute
+			s.timeouts[devices.DeviceType_Unknown] = time.Duration(report.Unknown) * time.Minute
 		}
 
 	}

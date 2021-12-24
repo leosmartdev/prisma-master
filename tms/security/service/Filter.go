@@ -398,6 +398,14 @@ func (a *RouteAuthorizer) Authorize(request *restful.Request, response *restful.
 				sec.Audit(request.Request.Context(), "MapConfig", "ANY", "FAIL", routePath)
 			}
 		}
+		// filtertracks
+		if strings.HasSuffix(routePath, "/filtertracks/get/{user-id}") ||
+			strings.HasSuffix(routePath, "/filtertracks/save/{user-id}") {
+			allowed = sec.HasPermissionForClass(request.Request.Context(), "FilterTracks")
+			if !allowed {
+				sec.Audit(request.Request.Context(), "FilterTracks", "ANY", "FAIL", routePath)
+			}
+		}
 		// message
 		if strings.HasSuffix(routePath, "/message") {
 			allowed = sec.HasPermissionForClass(request.Request.Context(), sec.CLASSIDMessage)

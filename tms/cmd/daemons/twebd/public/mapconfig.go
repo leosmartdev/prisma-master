@@ -134,7 +134,7 @@ func (mapconfigRest *MapConfigRest) SetSetting(request *restful.Request, respons
 	}
 }
 
-// TrackExReq extracts last track using registry id and constructs a trackex request that is send to tanalyzed
+// constructs a track timeout request that is send to tanalyzed
 // function returns an error if it fails
 func (mapconfigRest *MapConfigRest) TrackTimeoutReq(trackTimeout *moc.TrackTimeout) error {
 	body, err := tmsg.PackFrom(trackTimeout)

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package prisma.tms.moc;
+
+message FilterTracks {
+    string id = 1;
+    string user = 2;
+    string type = 3;
+    uint32 timeout = 4;
+    bool show = 5;
+    enum Action {
+        GET = 0;
+        UPDATE = 1;
+        DELETE = 2;
+    }
+}
+
+message FilterTrackRow {
+    FilterTrackCell adsb = 1;
+    FilterTrackCell ais = 2;
+    FilterTrackCell manual = 3;
+    FilterTrackCell marker = 4;
+    FilterTrackCell omnicom = 5;
+    FilterTrackCell radar = 6;
+    FilterTrackCell sarsat = 7;
+    FilterTrackCell sart = 8;
+    FilterTrackCell spidertrack = 9;
+    FilterTrackCell unknown = 10;
+}
+
+message FilterTrackSet {
+    repeated FilterTrackCell filterTracks = 1;
+}
+
+message FilterTrackCell {
+    string type = 1;
+    uint32 timeout = 2;
+    bool show = 3;
+}

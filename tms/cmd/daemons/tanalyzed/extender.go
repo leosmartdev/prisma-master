@@ -55,7 +55,7 @@ type trackExtenderStage struct {
 	ctxt        gogroup.GoGroup
 	db          db.TrackExDb
 	trackDb     db.TrackDB
-	mapconfigDb db.MapConfigDB // Leo: add mapconfig db
+	mapconfigDb db.MapConfigDB // add mapconfig db
 	watching    map[string]tms.TrackExtension
 	mutex       sync.RWMutex
 	tracer      *log.Tracer
@@ -67,7 +67,7 @@ type trackExtenderStage struct {
 	watchTicker *time.Ticker
 
 	trackExReqStream   <-chan *client.TMsg
-	trackTimeoutStream <-chan *client.TMsg // Leo
+	trackTimeoutStream <-chan *client.TMsg // tracktimeout stream
 
 	// initilized is bool variable that gets set to true when the init function is done
 	// only when initilized is true, we can analyze the stage
@@ -111,9 +111,6 @@ func (s *trackExtenderStage) init(ctxt gogroup.GoGroup, client *mongo.MongoClien
 
 	log.Info("MAPCONFIG START")
 
-	// for k := range s.timeouts {
-	// 	log.Info("MAPCONFIG First: timeout %+v: %+v", k, s.timeouts[k])
-	// }
 	if err == nil {
 		// timeoutMapConfig := new(moc.TrackTimeout)
 		for _, configDatum := range mapconfig {
@@ -121,8 +118,7 @@ func (s *trackExtenderStage) init(ctxt gogroup.GoGroup, client *mongo.MongoClien
 				// log.Info("MAPCONFIG: KEY: %+v", mocMapconfig.Key)
 				if mocMapconfig.Key == "track_timeouts" {
 					timeouts := mocMapconfig.Value
-					// s.timeouts[devices.DeviceType_AIS] = time.Duration(timeouts.Ais) * time.Minute
-					s.timeouts[devices.DeviceType_AIS] = 5 * time.Minute
+					s.timeouts[devices.DeviceType_AIS] = time.Duration(timeouts.Ais) * time.Minute
 					s.timeouts[devices.DeviceType_ADSB] = time.Duration(timeouts.Adsb) * time.Minute
 					s.timeouts[devices.DeviceType_Manual] = time.Duration(timeouts.Manual) * time.Minute
 					s.timeouts[devices.DeviceType_Marker] = time.Duration(timeouts.Marker) * time.Minute
@@ -237,17 +233,43 @@ func (s *trackExtenderStage) timeoutReq() {
 				continue
 			}
 			log.Info("MAPCONFIG: track timeout request received %+v", report)
-			s.timeouts[devices.DeviceType_AIS] = time.Duration(report.Ais) * time.Minute
-			s.timeouts[devices.DeviceType_ADSB] = time.Duration(report.Adsb) * time.Minute
-			s.timeouts[devices.DeviceType_Manual] = time.Duration(report.Manual) * time.Minute
-			s.timeouts[devices.DeviceType_Marker] = time.Duration(report.Marker) * time.Minute
-			s.timeouts[devices.DeviceType_OmnicomVMS] = time.Duration(report.Omnicom) * time.Minute
-			s.timeouts[devices.DeviceType_OmnicomSolar] = time.Duration(report.Omnicom) * time.Minute
-			s.timeouts[devices.DeviceType_Radar] = time.Duration(report.Radar) * time.Minute
-			s.timeouts[devices.DeviceType_SARSAT] = time.Duration(report.Sarsat) * time.Minute
-			s.timeouts[devices.DeviceType_SART] = time.Duration(report.Sart) * time.Minute
-			s.timeouts[devices.DeviceType_Spidertracks] = time.Duration(report.Spidertrack) * time.Minute
-			s.timeouts[devices.DeviceType_Unknown] = time.Duration(report.Unknown) * time.Minute
+			newTimeouts := make(map[devices.DeviceType]time.Duration)
+			newTimeouts = map[devices.DeviceType]time.Duration{
+				devices.DeviceType_AIS:          time.Duration(report.Ais) * time.Minute,
+				devices.DeviceType_ADSB:         time.Duration(report.Adsb) * time.Minute,
+				devices.DeviceType_Manual:       time.Duration(report.Manual) * time.Minute,
+				devices.DeviceType_Marker:       time.Duration(report.Marker) * time.Minute,
+				devices.DeviceType_OmnicomVMS:   time.Duration(report.Omnicom) * time.Minute,
+				devices.DeviceType_OmnicomSolar: time.Duration(report.Omnicom) * time.Minute,
+				devices.DeviceType_Radar:        time.Duration(report.Radar) * time.Minute,
+				devices.DeviceType_SARSAT:       time.Duration(report.Sarsat) * time.Minute,
+				devices.DeviceType_SART:         time.Duration(report.Sart) * time.Minute,
+				devices.DeviceType_Spidertracks: time.Duration(report.Spidertrack) * time.Minute,
+				devices.DeviceType_Unknown:      time.Duration(report.Unknown) * time.Minute,
+			}
+			// check timeout difference and update trackextentions
+			timeDiff := make(map[devices.DeviceType]time.Duration)
+			for k := range newTimeouts {
+				timeDiff[k] = newTimeouts[k] - s.timeouts[k]
+				log.Info("MAPCONFIG: Timeout Update: %+v: new: %+v old: %+v dif: %+v", k, newTimeouts[k], s.timeouts[k], timeDiff[k])
+			}
+			s.timeouts = newTimeouts // renew timeouts setting
+			// replace expire time in trackextentions
+			prev, err := s.db.Get()
+			if err != nil {
+				return
+			}
+			for _, ex := range prev {
+				timeDiffDuration := timeDiff[ex.Track.Targets[0].Type]
+				if timeDiffDuration == 0 {
+					continue
+				}
+				log.Info("MAPCONFIG: Extend Expires Update: %+v %+v timeDiff: %+v", ex.Track.Targets[0].Type, ex.Track.Id, timeDiffDuration)
+				err := s.updateExpire(ex, timeDiffDuration)
+				if err != nil {
+					log.Error("MAPCONFIG: cannot not update expire %+v", err)
+				}
+			}
 		}
 
 	}
@@ -449,5 +471,31 @@ func (s *trackExtenderStage) extend(ex tms.TrackExtension) error {
 		Body:      body,
 	}
 	s.tsiClient.Send(s.ctxt, m)
+	return err
+}
+
+func (s *trackExtenderStage) updateExpire(ex tms.TrackExtension, timeDiff time.Duration) error {
+
+	t := ex.Track
+	if len(t.Targets) == 0 {
+		// the record doesn't have any targets,
+		// so it is not useful and we will not continue handle it
+		return errors.New("target are not found")
+	}
+	t.Targets[0].Repeat = true
+
+	update := tms.TrackExtension{
+		Track:   t,
+		Updated: ex.Updated,
+		Next:    ex.Next,
+		Expires: ex.Expires.Add(timeDiff),
+		Count:   ex.Count,
+	}
+	s.mutex.Lock()
+	s.watching[t.Id] = update
+	s.mutex.Unlock()
+
+	err := s.db.Update(update)
+
 	return err
 }

@@ -16,22 +16,23 @@ import (
 )
 
 const (
-	RULE_CLASS_ID     = "Rule"
-	POLICY_CLASS_ID   = "Policy"
-	INCIDENT_CLASS_ID = "Incident"
-	NOTE_CLASS_ID     = "IncidentLogEntry"
-	MARKER_CLASS_ID   = "Marker"
-	ICON_CLASS_ID     = "Icon"
-	CLASSIDFleet      = "Fleet"
-	CLASSIDVessel     = "Vessel"
-	CLASSIDDevice     = "Device"
-	CLASSIDSite       = "Site"
-	CLASSIDConfig     = "Config"
-	CLASSIDMulticast  = "Multicast"
-	CLASSIDRemoteSite = "RemoteSite"
-	CLASSIDSit915     = "Sit915"
-	CLASSIDMessage    = "Message"
-	MAPCONFIG_CLASSID = "MapConfig"
+	RULE_CLASS_ID        = "Rule"
+	POLICY_CLASS_ID      = "Policy"
+	INCIDENT_CLASS_ID    = "Incident"
+	NOTE_CLASS_ID        = "IncidentLogEntry"
+	MARKER_CLASS_ID      = "Marker"
+	ICON_CLASS_ID        = "Icon"
+	CLASSIDFleet         = "Fleet"
+	CLASSIDVessel        = "Vessel"
+	CLASSIDDevice        = "Device"
+	CLASSIDSite          = "Site"
+	CLASSIDConfig        = "Config"
+	CLASSIDMulticast     = "Multicast"
+	CLASSIDRemoteSite    = "RemoteSite"
+	CLASSIDSit915        = "Sit915"
+	CLASSIDMessage       = "Message"
+	MAPCONFIG_CLASSID    = "MapConfig"
+	FILTERTRACKS_CLASSID = "FilterTracks"
 )
 
 var (
@@ -245,6 +246,12 @@ var Permissions_StandardUser = []*message.Permission{
 			moc.MapConfig_GET.String(),
 		},
 	},
+	{
+		ClassId: FILTERTRACKS_CLASSID,
+		Actions: []string{
+			moc.FilterTracks_GET.String(),
+		},
+	},
 }
 
 var Permissions_FleetManager = []*message.Permission{
@@ -428,6 +435,14 @@ var Permissions_IncidentManager = []*message.Permission{
 			moc.MapConfig_GET.String(),
 			moc.MapConfig_DELETE.String(),
 			moc.MapConfig_UPDATE.String(),
+		},
+	},
+	{
+		ClassId: FILTERTRACKS_CLASSID,
+		Actions: []string{
+			moc.FilterTracks_GET.String(),
+			moc.FilterTracks_DELETE.String(),
+			moc.FilterTracks_UPDATE.String(),
 		},
 	},
 }
@@ -647,6 +662,14 @@ var Permissions_Administrator = []*message.Permission{
 			moc.MapConfig_GET.String(),
 			moc.MapConfig_DELETE.String(),
 			moc.MapConfig_UPDATE.String(),
+		},
+	},
+	{
+		ClassId: FILTERTRACKS_CLASSID,
+		Actions: []string{
+			moc.FilterTracks_GET.String(),
+			moc.FilterTracks_DELETE.String(),
+			moc.FilterTracks_UPDATE.String(),
 		},
 	},
 }

@@ -138,7 +138,13 @@ ldb.createCollection("zones");
 ldb.createCollection("sit915");
 
 ldb.createCollection("mapconfig");
-ldb.mapconfig.createIndex({"key": 1}, {
-    name: "mapconfigKey",
-    unique: true
-});
+// ldb.mapconfig.createIndex({"me.key": 1}, {
+//     name: "mapconfigKey",
+//     unique: true
+// });
+
+ldb.createCollection("filtertracks");
+// ldb.filtertracks.createIndex({"me.type": 1}, {
+//     name: "tracktype",
+//     unique: true
+// });

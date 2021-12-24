@@ -776,6 +776,20 @@ func main() {
 			Writes(moc.MapConfig{}).
 			Returns(http.StatusCreated, "OK", moc.MapConfig{}))
 
+		// MapConfig service
+		filterTracksRest := public.NewFilterTracksRest(ctxt, mongoClient)
+		webService.Route(webService.GET("/filtertracks/get/{user-id}").To(filterTracksRest.GetFilterTracks).
+			Doc("get filter tracks").
+			Metadata(restfulspec.KeyOpenAPITags, []string{"filtertracks"}).
+			Writes(moc.FilterTracks{}).
+			Returns(http.StatusOK, "OK", []moc.FilterTracks{}))
+		webService.Route(webService.POST("/filtertracks/save/{user-id}").To(filterTracksRest.SaveFilterTracks).
+			Doc("save filter tracks").
+			Metadata(restfulspec.KeyOpenAPITags, []string{"filtertracks"}).
+			ReadsWithSchema(moc.FilterTracks{}, public.SCHEMA_FILTER_TRACKS).
+			Writes(moc.FilterTracks{}).
+			Returns(http.StatusCreated, "OK", []moc.FilterTracks{}))
+
 		// add to container
 		container.Add(webService)
 		handler.Add(webService.RootPath(), container)

@@ -93,6 +93,10 @@ var (
 			Name: "mapconfig",
 			Inst: moc.MapConfig{},
 		},
+		{
+			Name: "filtertracks",
+			Inst: moc.FilterTracks{},
+		},
 	})
 
 	MiscIndexes = []Index{
